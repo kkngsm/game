@@ -1,22 +1,39 @@
-import { Key } from "../Key";
-import { Scene, State } from "./Scene";
-
+import {
+  BoxGeometry,
+  Mesh,
+  MeshBasicMaterial,
+  OrthographicCamera,
+  Scene as TScene,
+} from "three";
+import { Scene, SceneProps, State } from "./Scene";
 export default class Battle extends Scene {
-  constructor(key: Key) {
-    super(key);
+  private scene: TScene;
+  private camera: OrthographicCamera;
+  constructor(prop: SceneProps) {
+    super(prop);
+    this.scene = new TScene();
+    this.camera = new OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 1, 10000);
+
+    const geometry = new BoxGeometry(0.1, 0.1, 0.1);
+    const material = new MeshBasicMaterial({ color: 0xffff00 });
+    const mesh = new Mesh(geometry, material);
+    this.scene.add(mesh);
   }
 
-  async run() {
+  async run(): Promise<State> {
     console.log("Battle");
-    return new Promise<State>((resolve) => {
+    return new Promise<void>((resolve) => {
       const draw = (time: number) => {
         console.log("draw");
+        this.renderer.setRenderTarget(null);
+        this.renderer.clear();
+        this.renderer.render(this.scene, this.camera);
         if (this.key.key !== "Enter") {
           requestAnimationFrame(() => {
             draw(time);
           });
         } else {
-          resolve("Result" as State);
+          resolve();
         }
       };
       requestAnimationFrame((time) => {

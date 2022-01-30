@@ -1,15 +1,23 @@
+import { WebGLRenderer } from "three";
 import { Key } from "./Key";
 import Battle from "./scenes/Battle";
 import Result from "./scenes/Result";
-import { State } from "./scenes/Scene";
+import { SceneProps, State } from "./scenes/Scene";
 import Title from "./scenes/Title";
-
 window.addEventListener("load", main);
 async function main() {
+  const canvas = <HTMLCanvasElement>document.getElementById("canvas");
+
   const key = new Key();
-  const title = new Title(key);
-  const battle = new Battle(key);
-  const result = new Result(key);
+  const renderer = new WebGLRenderer({ canvas });
+
+  const props: SceneProps = {
+    key,
+    renderer,
+  };
+  const title = new Title(props);
+  const battle = new Battle(props);
+  const result = new Result(props);
   //状態遷移によるシーン管理
   let currentState: State = "Title";
   stateMachine: for (;;) {

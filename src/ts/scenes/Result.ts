@@ -1,9 +1,8 @@
-import { Key } from "../Key";
-import { Scene, State } from "./Scene";
+import { Scene, SceneProps, State } from "./Scene";
 
 export default class Result extends Scene {
-  constructor(key: Key) {
-    super(key);
+  constructor(prop: SceneProps) {
+    super(prop);
   }
 
   run(): State {
