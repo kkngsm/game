@@ -1,16 +1,17 @@
+import { Key } from "./Key";
+import { State } from "./scenes/Scene";
+import Title from "./scenes/Title";
+
 window.addEventListener("load", main);
-
-export type State = "Title" | "Battle" | "Result" | "End";
-
 function main() {
+  const key = new Key();
+  const title = new Title(key);
   //状態遷移によるシーン管理
-
   let currentState: State = "Title";
   stateMachine: for (;;) {
     switch (currentState) {
       case "Title":
-        console.log(currentState);
-        currentState = "Battle";
+        currentState = title.run();
         break;
       case "Battle":
         console.log(currentState);
