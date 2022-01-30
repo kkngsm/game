@@ -1,5 +1,6 @@
 import { Key } from "./Key";
 import Battle from "./scenes/Battle";
+import Result from "./scenes/Result";
 import { State } from "./scenes/Scene";
 import Title from "./scenes/Title";
 
@@ -8,7 +9,7 @@ async function main() {
   const key = new Key();
   const title = new Title(key);
   const battle = new Battle(key);
-
+  const result = new Result(key);
   //状態遷移によるシーン管理
   let currentState: State = "Title";
   stateMachine: for (;;) {
@@ -20,8 +21,7 @@ async function main() {
         currentState = await battle.run();
         break;
       case "Result":
-        console.log(currentState);
-        currentState = "End";
+        currentState = result.run();
         break;
       case "End":
         console.log(currentState);
