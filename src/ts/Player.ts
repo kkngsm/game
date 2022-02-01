@@ -1,4 +1,4 @@
-import { BoxGeometry, Mesh, MeshBasicMaterial } from "three";
+import { BoxGeometry, Mesh, MeshBasicMaterial, Vector3 } from "three";
 import { Key } from "./Key";
 
 export default class Player {
@@ -21,5 +21,8 @@ export default class Player {
     if (key.d) {
       this.mesh.position.x = this.mesh.position.x + 0.5;
     }
+  }
+  get pos(): Vector3 {
+    return this.mesh.position;
   }
 }
