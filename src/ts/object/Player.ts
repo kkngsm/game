@@ -1,12 +1,14 @@
 import { BoxGeometry, Mesh, MeshBasicMaterial, Vector3 } from "three";
-import { Key } from "./Key";
+import { Key } from "../Key";
 
 export default class Player {
   mesh: Mesh;
+  lastFiredTime: number;
   constructor() {
     const box = new BoxGeometry(10, 10, 10);
     const mat = new MeshBasicMaterial({ color: 0x1ec876 });
     this.mesh = new Mesh(box, mat);
+    this.lastFiredTime = -10;
   }
   operation(key: Key) {
     if (key.w) {

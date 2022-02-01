@@ -1,36 +1,20 @@
-import { PerspectiveCamera, Scene as TScene, Vector3 } from "three";
-import Bullet from "../bullet/Bullet";
-import Player from "../Player";
+import { PerspectiveCamera } from "three";
+import Objects from "../object/Objects";
 import { Scene, SceneProps, State } from "./Scene";
 export default class Battle extends Scene {
-  private scene: TScene;
   private camera: PerspectiveCamera;
-  private player: Player;
-  private bullets: Bullet[];
+  private objects: Objects;
   constructor(prop: SceneProps) {
     super(prop);
-    this.scene = new TScene();
-    this.bullets = [];
-    this.camera = new PerspectiveCamera(
-      45,
-      this.size.width / this.size.height,
-      1,
-      10000
-    );
-    this.camera.position.z = 100;
-    this.camera.lookAt(new Vector3(0, 0, 0));
-
-    this.player = new Player();
-    this.player.mesh.position.set(0, 0, 0);
-    this.scene.add(this.player.mesh);
+    this.objects = new Objects(this.size);
   }
 
   async run(): Promise<State> {
     return new Promise<void>((resolve) => {
       const loop = (time: number) => {
-        this.operation();
+        this.operation(time);
         this.update();
-        this.draw(time);
+        this.draw();
         if (!this.key.enter) {
           requestAnimationFrame(loop);
         } else {
@@ -44,20 +28,14 @@ export default class Battle extends Scene {
   }
 
   private update(): void {
-    this.bullets.forEach((e) => e.update());
+    this.objects.update();
   }
-  private draw(time: number): void {
+  private draw(): void {
     this.renderer.setRenderTarget(null);
     this.renderer.clear();
-    this.renderer.render(this.scene, this.camera);
+    this.renderer.render(this.objects.scene, this.objects.camera);
   }
-
-  private operation() {
-    this.player.operation(this.key);
-    if (this.key.space) {
-      const bullet = new Bullet(this.player.pos);
-      this.bullets.push(bullet);
-      this.scene.add(bullet.mesh);
-    }
+  private operation(time: number) {
+    this.objects.operation(time, this.key);
   }
 }
