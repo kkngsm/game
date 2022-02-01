@@ -33,6 +33,9 @@ export default class Objects {
         this.bullets.push(bullet);
         this.scene.add(bullet.mesh);
         this.player.lastFiredTime = time;
+        if (this.bullets.length > 100) {
+          this.scene.remove((<Bullet>this.bullets.shift()).mesh);
+        }
       }
     }
   }
