@@ -1,16 +1,10 @@
-import {
-  BoxGeometry,
-  Mesh,
-  MeshBasicMaterial,
-  PerspectiveCamera,
-  Scene as TScene,
-  Vector3,
-} from "three";
+import { PerspectiveCamera, Scene as TScene, Vector3 } from "three";
+import Player from "../Player";
 import { Scene, SceneProps, State } from "./Scene";
 export default class Battle extends Scene {
   private scene: TScene;
   private camera: PerspectiveCamera;
-  private cube: Mesh;
+  private Player: Player;
   constructor(prop: SceneProps) {
     super(prop);
     this.scene = new TScene();
@@ -24,11 +18,9 @@ export default class Battle extends Scene {
     this.camera.position.z = 100;
     this.camera.lookAt(new Vector3(0, 0, 0));
 
-    const box = new BoxGeometry(10, 10, 10);
-    const mat = new MeshBasicMaterial({ color: 0x1ec876 });
-    this.cube = new Mesh(box, mat);
-    this.cube.position.set(0, 0, 0);
-    this.scene.add(this.cube);
+    this.Player = new Player();
+    this.Player.mesh.position.set(0, 0, 0);
+    this.scene.add(this.Player.mesh);
   }
 
   async run(): Promise<State> {
@@ -56,17 +48,6 @@ export default class Battle extends Scene {
   }
 
   private operation() {
-    if (this.key.w) {
-      this.cube.position.y = this.cube.position.y + 0.5;
-    }
-    if (this.key.a) {
-      this.cube.position.x = this.cube.position.x - 0.5;
-    }
-    if (this.key.s) {
-      this.cube.position.y = this.cube.position.y - 0.5;
-    }
-    if (this.key.d) {
-      this.cube.position.x = this.cube.position.x + 0.5;
-    }
+    this.Player.operation(this.key);
   }
 }
