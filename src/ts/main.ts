@@ -3,7 +3,7 @@ import "../sass/style.sass";
 import { Key } from "./Key";
 import Battle from "./scenes/Battle";
 import Result from "./scenes/Result";
-import { SceneProps, State } from "./scenes/Scene";
+import { SceneProps, Size, State } from "./scenes/Scene";
 import Title from "./scenes/Title";
 class Game {
   constructor() {}
@@ -12,7 +12,7 @@ class Game {
 
     const key = new Key();
     const renderer = new WebGLRenderer({ canvas, antialias: true });
-    const size = {
+    const size: Size = {
       width: canvas.clientWidth,
       height: canvas.clientHeight,
     };
@@ -40,6 +40,8 @@ class Game {
         case "End":
           console.log(currentState);
           break stateMachine;
+        default:
+          throw new Error("State machine: unknown value error");
       }
     }
     console.log("end");

@@ -34,27 +34,31 @@ export default class Battle extends Scene {
   async run(): Promise<State> {
     console.log("Battle");
     return new Promise<void>((resolve) => {
-      const draw = (time: number) => {
-        this.camera.position.x = Math.sin(time * 0.001) * 100;
-        this.camera.position.z = Math.cos(time * 0.001) * 100;
-        this.camera.lookAt(new Vector3(0, 0, 0));
-
-        this.renderer.setRenderTarget(null);
-        this.renderer.clear();
-        this.renderer.render(this.scene, this.camera);
-        if (this.key.key !== "Enter") {
+      const loop = (time: number) => {
+        this.draw(time);
+        if (!this.key.enter) {
           requestAnimationFrame((time) => {
-            draw(time);
+            loop(time);
           });
         } else {
           resolve();
         }
       };
       requestAnimationFrame((time) => {
-        draw(time);
+        loop(time);
       });
     }).then(() => {
       return "Result" as State;
     });
+  }
+
+  private draw(time: number): void {
+    this.camera.position.x = Math.sin(time * 0.001) * 100;
+    this.camera.position.z = Math.cos(time * 0.001) * 100;
+    this.camera.lookAt(new Vector3(0, 0, 0));
+
+    this.renderer.setRenderTarget(null);
+    this.renderer.clear();
+    this.renderer.render(this.scene, this.camera);
   }
 }
