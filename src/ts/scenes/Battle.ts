@@ -1,8 +1,6 @@
-import { PerspectiveCamera } from "three";
 import Objects from "../object/Objects";
 import { Scene, SceneProps, State } from "./Scene";
 export default class Battle extends Scene {
-  private camera: PerspectiveCamera;
   private objects: Objects;
   constructor(prop: SceneProps) {
     super(prop);

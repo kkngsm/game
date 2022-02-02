@@ -23,12 +23,13 @@ export default class Objects {
   }
   update() {
     this.bullets.forEach((e) => e.update());
+    this.player.update();
   }
   operation(time: number, key: Key) {
     this.player.operation(key);
     if (key.space) {
       console.log(time - this.player.lastFiredTime);
-      if (time - this.player.lastFiredTime > config.rate.bullet) {
+      if (time - this.player.lastFiredTime > config.bullet.rate) {
         const bullet = new Bullet(this.player.pos);
         this.bullets.push(bullet);
         this.scene.add(bullet.mesh);

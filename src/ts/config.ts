@@ -1,14 +1,26 @@
-type WeponsValue = {
-  bullet: number;
+import Bullet from "./object/bullet/Bullet";
+
+type PlayerSetting = {
+  acceleration: number;
+  maxSpeed: number;
+};
+
+type WeponsSetting = {
+  rate: number;
 };
 
 type Config = {
-  rate: WeponsValue;
+  player: PlayerSetting;
+  bullet: WeponsSetting;
 };
 
 const config: Config = {
-  rate: {
-    bullet: 50,
+  player: {
+    acceleration: 0.1,
+    maxSpeed: 0.5,
   },
-};
+  bullet: {
+    rate: 50,
+  },
+} as const;
 export default config;
