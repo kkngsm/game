@@ -1,11 +1,11 @@
-import { IcosahedronGeometry, Mesh, MeshBasicMaterial, Vector3 } from "three";
+import { IcosahedronGeometry, MeshBasicMaterial, Vector3 } from "three";
+import GameObject from "../Object";
 
-export default class Bullet {
-  mesh: Mesh;
+export default class Bullet extends GameObject {
   constructor(pos: Vector3) {
     const box = new IcosahedronGeometry(1, 0);
     const mat = new MeshBasicMaterial({ color: 0xa42d2d });
-    this.mesh = new Mesh(box, mat);
+    super(box, mat);
     this.mesh.position.set(pos.x, pos.y, pos.z);
   }
   update() {

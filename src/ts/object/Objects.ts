@@ -29,6 +29,19 @@ export default class GameObjects {
   update() {
     this.bullets.forEach((e) => e.update());
     this.player.update();
+    const len = this.bullets.length;
+    for (let i = 0; i < len; i = i + 1) {
+      const distance = new Vector3()
+        .copy(this.bullets[i].pos)
+        .sub(this.enemy.pos)
+        .length();
+      console.log(distance);
+      if (distance < 5 || this.bullets[i].pos.x > 50) {
+        this.scene.remove((this.bullets.splice(i, 1)[0] as Bullet).mesh);
+        console.log("delete");
+        break;
+      }
+    }
   }
   operation(time: number, key: Key) {
     this.player.operation(key);
@@ -39,7 +52,7 @@ export default class GameObjects {
         this.scene.add(bullet.mesh);
         this.player.lastFiredTime = time;
         if (this.bullets.length > 100) {
-          this.scene.remove((<Bullet>this.bullets.shift()).mesh);
+          this.scene.remove((this.bullets.shift() as Bullet).mesh);
         }
       }
     }

@@ -45,7 +45,4 @@ export default class Player extends GameObject {
     this.mesh.position.y += this.speed.y;
     this.speed.multiplyScalar(0.9);
   }
-  get pos(): Vector3 {
-    return this.mesh.position;
-  }
 }
