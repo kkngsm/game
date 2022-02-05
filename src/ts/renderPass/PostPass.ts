@@ -7,7 +7,10 @@ import {
   PlaneGeometry,
   RawShaderMaterial,
   RGBAFormat,
+  Texture,
   UnsignedByteType,
+  Vector2,
+  Vector3,
   WebGLRenderer,
   WebGLRenderTarget,
 } from "three";
@@ -16,6 +19,7 @@ import { Size } from "../scenes/Scene";
 import vs from "../../glsl/postpass.vert";
 import toonfs from "../../glsl/toon.frag";
 import bloomfs from "../../glsl/bloom.frag";
+import fxaafs from "../../glsl/fxaa.frag";
 import {
   renderInfo,
   WebGLDefferdRenderTargets,
@@ -28,12 +32,12 @@ import {
 export class PostPass extends RenderPass {
   private uniforms: {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [uniform in "cameraPos" | "width" | "height" | renderInfo]: {
+    [uniform in "cameraPos" | "resolution" | renderInfo]: {
       type: string;
-      value: any;
+      value: Texture | Vector2 | Vector3;
     };
   };
-  private tempRenderTarget: WebGLRenderTarget;
+  private tempRenderTarget: WebGLRenderTarget[];
   private materials: Material[];
   private mesh: Mesh;
   /**
@@ -46,17 +50,17 @@ export class PostPass extends RenderPass {
   ) {
     super(new OrthographicCamera(-0.5, 0.5, 0.5, -0.5, -10000, 10000));
     this.camera.position.z = 100;
-    this.tempRenderTarget = new WebGLRenderTarget(size.width, size.height, {
+    const wrt = new WebGLRenderTarget(size.width, size.height, {
       minFilter: LinearFilter,
       magFilter: LinearFilter,
       format: RGBAFormat,
       type: UnsignedByteType,
     });
+    this.tempRenderTarget = [wrt, wrt.clone()];
 
     this.uniforms = {
       cameraPos: { type: "v3", value: this.camera.position },
-      width: { type: "f", value: size.width },
-      height: { type: "f", value: size.height },
+      resolution: { type: "v2", value: new Vector2(size.width, size.height) },
       albedo: { type: "t", value: prevRenderTargets.texture[0] },
       normal: { type: "t", value: prevRenderTargets.texture[1] },
     };
@@ -76,6 +80,13 @@ export class PostPass extends RenderPass {
         fragmentShader: bloomfs,
         glslVersion: GLSL3,
       }),
+      /*fxaa */
+      new RawShaderMaterial({
+        uniforms: this.uniforms,
+        vertexShader: vs,
+        fragmentShader: fxaafs,
+        glslVersion: GLSL3,
+      }),
     ];
     const plane = new PlaneGeometry(1.0, 1.0);
     this.mesh = new Mesh(plane, this.materials[0]);
@@ -86,24 +97,18 @@ export class PostPass extends RenderPass {
    * @param renderer WebGLRenderer
    */
   render(renderer: WebGLRenderer) {
+    this.uniforms.albedo.value = this.prevRenderTargets.texture[0];
     const maxIndex = this.materials.length - 1;
     for (let i = 0; i < maxIndex; i++) {
-      this.mesh.material = this.materials[i];
-      renderer.setRenderTarget(this.tempRenderTarget);
+      this.mesh.material = this.materials[0];
+      const renderTarget = this.tempRenderTarget[i % 2];
+      renderer.setRenderTarget(renderTarget);
       renderer.render(this.scene, this.camera);
-      [this.uniforms.albedo.value, this.tempRenderTarget.texture] = [
-        this.tempRenderTarget.texture,
-        this.uniforms.albedo.value,
-      ];
+      this.uniforms.albedo.value = renderTarget.texture;
     }
 
     this.mesh.material = this.materials[maxIndex];
     renderer.setRenderTarget(null);
     renderer.render(this.scene, this.camera);
-
-    [this.uniforms.albedo.value, this.tempRenderTarget.texture] = [
-      this.tempRenderTarget.texture,
-      this.uniforms.albedo.value,
-    ];
   }
 }
