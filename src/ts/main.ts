@@ -1,7 +1,7 @@
 import { WebGLRenderer } from "three";
 import "../sass/style.sass";
 import { Key } from "./Key";
-import Battle from "./scenes/Battle";
+import Battle from "./scenes/Battle/Battle";
 import Result from "./scenes/Result";
 import { SceneProps, Size, State } from "./scenes/Scene";
 import Title from "./scenes/Title";

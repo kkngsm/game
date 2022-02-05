@@ -1,6 +1,6 @@
-import { BoxGeometry, MeshBasicMaterial, Vector2, Vector3 } from "three";
-import { Key } from "../Key";
-import config from "../config";
+import { BoxGeometry, MeshBasicMaterial, Vector2 } from "three";
+import { Key } from "../../../Key";
+import config from "../../../config";
 import GameObject from "./Object";
 export default class Player extends GameObject {
   lastFiredTime: number;

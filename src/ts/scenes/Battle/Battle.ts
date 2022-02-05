@@ -1,8 +1,8 @@
 import { RGBAFormat, UnsignedByteType } from "three";
-import MainPath from "../object/MainPath";
-import { PostEffect } from "../postEffects/PostEffect";
-import { WebGLDefferdRenderTargets } from "../renderPath/WebGLDefferdRenderer";
-import { Scene, SceneProps, State } from "./Scene";
+import MainPath from "./object/MainPath";
+import { PostEffect } from "../../postEffects/PostEffect";
+import { WebGLDefferdRenderTargets } from "../../renderPath/WebGLDefferdRenderer";
+import { Scene, SceneProps, State } from "../Scene";
 export default class Battle extends Scene {
   private mainPath: MainPath;
   private postPath: PostEffect;
@@ -13,7 +13,7 @@ export default class Battle extends Scene {
     this.rawRender = new WebGLDefferdRenderTargets(
       this.size.width,
       this.size.height,
-      [{ name: "color", type: UnsignedByteType, format: RGBAFormat }]
+      [{ name: "albedo", type: UnsignedByteType, format: RGBAFormat }]
     );
 
     this.postPath = new PostEffect(this.size, this.rawRender.texture);
@@ -48,6 +48,7 @@ export default class Battle extends Scene {
     this.renderer.setRenderTarget(null);
     this.renderer.clear();
     this.renderer.render(this.postPath.scene, this.postPath.camera);
+    // this.renderer.render(this.mainPath.scene, this.mainPath.camera);
   }
   private operation(time: number) {
     this.mainPath.operation(time, this.key);

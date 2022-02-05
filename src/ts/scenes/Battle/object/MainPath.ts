@@ -1,11 +1,11 @@
 import Bullet from "./bullet/Bullet";
 import Player from "./Player";
 import { PerspectiveCamera, Vector3 } from "three";
-import { Size } from "../scenes/Scene";
-import { Key } from "../Key";
-import config from "../config";
+import { Size } from "../../../scenes/Scene";
+import { Key } from "../../../Key";
+import config from "../../../config";
 import Enemy from "./enemy/Enemy";
-import RenderPath from "../renderPath/RenderPath";
+import RenderPath from "../../../renderPath/RenderPath";
 
 export default class MainPath extends RenderPath {
   private player: Player;
