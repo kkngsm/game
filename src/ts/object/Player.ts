@@ -1,8 +1,8 @@
 import { BoxGeometry, Vector2 } from "three";
-import { Key } from "../../../Key";
-import config from "../../../config";
+import { Key } from "../Key";
+import config from "../config";
 import GameObject from "./Object";
-import createStanderdMaterial from "../../../materials/StanderdMaterial";
+import createStanderdMaterial from "../materials/StanderdMaterial";
 export default class Player extends GameObject {
   lastFiredTime: number;
   speed: Vector2;

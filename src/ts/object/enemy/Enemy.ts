@@ -1,5 +1,5 @@
 import { SphereGeometry } from "three";
-import createStanderdMaterial from "../../../../materials/StanderdMaterial";
+import createStanderdMaterial from "../../materials/StanderdMaterial";
 import GameObject from "../Object";
 
 export default class Enemy extends GameObject {

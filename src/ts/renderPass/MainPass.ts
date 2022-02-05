@@ -1,13 +1,13 @@
-import Bullet from "./bullet/Bullet";
-import Player from "./Player";
+import Bullet from "../object/bullet/Bullet";
+import Player from "../object/Player";
 import { PerspectiveCamera, Vector3 } from "three";
-import { Size } from "../../../scenes/Scene";
-import { Key } from "../../../Key";
-import config from "../../../config";
-import Enemy from "./enemy/Enemy";
-import RenderPath from "../../../renderPath/RenderPath";
+import { Size } from "../scenes/Scene";
+import { Key } from "../Key";
+import config from "../config";
+import Enemy from "../object/enemy/Enemy";
+import RenderPass from "./RenderPass";
 
-export default class MainPath extends RenderPath {
+export default class MainPath extends RenderPass {
   private player: Player;
   private bullets: Bullet[];
   private enemy: Enemy;

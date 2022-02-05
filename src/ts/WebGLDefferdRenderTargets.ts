@@ -7,7 +7,7 @@ import {
   Wrapping,
 } from "three";
 
-export type renderInfo = "albedo";
+export type renderInfo = "albedo" | "normal";
 
 export interface WebGLDefferdRenderTargetsOptions
   extends WebGLRenderTargetOptions {
