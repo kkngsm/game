@@ -1,13 +1,14 @@
-import { BoxGeometry, MeshBasicMaterial, Vector2 } from "three";
+import { BoxGeometry, Vector2 } from "three";
 import { Key } from "../../../Key";
 import config from "../../../config";
 import GameObject from "./Object";
+import createStanderdMaterial from "../../../materials/StanderdMaterial";
 export default class Player extends GameObject {
   lastFiredTime: number;
   speed: Vector2;
   constructor() {
     const box = new BoxGeometry(10, 10, 10);
-    const mat = new MeshBasicMaterial({ color: 0x1ec876 });
+    const mat = createStanderdMaterial(0x1ec876);
     super(box, mat);
     this.speed = new Vector2(0, 0);
     this.lastFiredTime = -10;

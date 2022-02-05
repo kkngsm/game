@@ -1,22 +1,29 @@
-import { RGBAFormat, UnsignedByteType } from "three";
+import { LinearFilter, RGBAFormat, UnsignedByteType } from "three";
 import MainPath from "./object/MainPath";
-import { PostEffect } from "../../postEffects/PostEffect";
 import { WebGLDefferdRenderTargets } from "../../renderPath/WebGLDefferdRenderer";
 import { Scene, SceneProps, State } from "../Scene";
+import { BloomEffect } from "../../postEffects/Bloom";
 export default class Battle extends Scene {
-  private mainPath: MainPath;
-  private postPath: PostEffect;
+  private main: MainPath;
+  private bloom: BloomEffect;
   private rawRender: WebGLDefferdRenderTargets;
   constructor(prop: SceneProps) {
     super(prop);
-    this.mainPath = new MainPath(this.size);
+    this.main = new MainPath(this.size);
     this.rawRender = new WebGLDefferdRenderTargets(
       this.size.width,
       this.size.height,
-      [{ name: "albedo", type: UnsignedByteType, format: RGBAFormat }]
+      [
+        {
+          name: "albedo",
+          minFilter: LinearFilter,
+          magFilter: LinearFilter,
+          type: UnsignedByteType,
+          format: RGBAFormat,
+        },
+      ]
     );
-
-    this.postPath = new PostEffect(this.size, this.rawRender.texture);
+    this.bloom = new BloomEffect(this.size, this.rawRender);
   }
 
   async run(): Promise<State> {
@@ -38,19 +45,18 @@ export default class Battle extends Scene {
   }
 
   private update(): void {
-    this.mainPath.update();
+    this.main.update();
   }
   private draw(): void {
     this.renderer.setRenderTarget(this.rawRender);
     this.renderer.clear();
-    this.renderer.render(this.mainPath.scene, this.mainPath.camera);
+    this.renderer.render(this.main.scene, this.main.camera);
 
     this.renderer.setRenderTarget(null);
     this.renderer.clear();
-    this.renderer.render(this.postPath.scene, this.postPath.camera);
-    // this.renderer.render(this.mainPath.scene, this.mainPath.camera);
+    this.renderer.render(this.bloom.scene, this.bloom.camera);
   }
   private operation(time: number) {
-    this.mainPath.operation(time, this.key);
+    this.main.operation(time, this.key);
   }
 }

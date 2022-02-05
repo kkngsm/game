@@ -4,12 +4,11 @@ import {
   OrthographicCamera,
   PlaneGeometry,
   RawShaderMaterial,
-  ShaderMaterial,
 } from "three";
 import RenderPath from "../renderPath/RenderPath";
 import { Size } from "../scenes/Scene";
-import vs from "./glsl/standerd.vert";
-import fs from "./glsl/standerd.frag";
+import vs from "../../glsl/standerd.vert";
+import fs from "../../glsl/standerd.frag";
 import { TextureWithName } from "../renderPath/WebGLDefferdRenderer";
 export class PostEffect extends RenderPath {
   uniforms: { [uniform: string]: { type: string; value: any } };

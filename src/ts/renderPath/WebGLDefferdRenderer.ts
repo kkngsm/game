@@ -7,12 +7,14 @@ import {
   Wrapping,
 } from "three";
 
+export type renderInfo = "albedo";
+
 export interface WebGLDefferdRenderTargetsOptions
   extends WebGLRenderTargetOptions {
-  name: string;
+  name: renderInfo;
 }
 export interface TextureWithName extends Texture {
-  name: string;
+  name: renderInfo;
 }
 export class WebGLDefferdRenderTargets extends WebGLMultipleRenderTargets {
   texture: TextureWithName[];
