@@ -7,10 +7,17 @@ import config from "../config";
 import Enemy from "../object/enemy/Enemy";
 import RenderPass from "./RenderPass";
 
+/**
+ * メインの処理のクラス
+ * 遅延なのでalbedo, normalを出力
+ */
 export default class MainPath extends RenderPass {
   private player: Player;
   private bullets: Bullet[];
   private enemy: Enemy;
+  /**
+   * @param size 画面サイズ
+   */
   constructor(size: Size) {
     super(new PerspectiveCamera(45, size.width / size.height, 1, 10000));
     this.camera.position.z = 100;
@@ -24,6 +31,10 @@ export default class MainPath extends RenderPass {
 
     this.scene.add(this.player.mesh, this.enemy.mesh);
   }
+  /**
+   * 更新処理をする
+   * 接触、ダメージなど
+   */
   update() {
     this.bullets.forEach((e) => e.update());
     this.player.update();
@@ -39,6 +50,11 @@ export default class MainPath extends RenderPass {
       }
     }
   }
+  /**
+   * 操作による更新を行う
+   * @param time レンダリング開始からの時間
+   * @param key キー入力クラス
+   */
   operation(time: number, key: Key) {
     this.player.operation(key);
     if (key.space) {

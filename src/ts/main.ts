@@ -10,7 +10,9 @@ class Game {
     const canvas = <HTMLCanvasElement>document.getElementById("canvas");
 
     const key = new Key();
-    const renderer = new WebGLRenderer({ canvas, antialias: true });
+    const renderer = new WebGLRenderer({ canvas });
+    renderer.autoClear = true;
+    renderer.setClearAlpha(0);
     const size: Size = {
       width: canvas.clientWidth,
       height: canvas.clientHeight,

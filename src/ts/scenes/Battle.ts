@@ -56,7 +56,6 @@ export default class Battle extends Scene {
   }
   private draw(): void {
     this.renderer.setRenderTarget(this.rawRender);
-    this.renderer.clear();
     this.renderer.render(this.main.scene, this.main.camera);
 
     this.post.render(this.renderer);
