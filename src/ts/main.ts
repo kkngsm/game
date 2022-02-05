@@ -6,7 +6,6 @@ import Result from "./scenes/Result";
 import { SceneProps, Size, State } from "./scenes/Scene";
 import Title from "./scenes/Title";
 class Game {
-  constructor() {}
   async main() {
     const canvas = <HTMLCanvasElement>document.getElementById("canvas");
 

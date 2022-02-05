@@ -1,5 +1,3 @@
-import Bullet from "./object/bullet/Bullet";
-
 type PlayerSetting = {
   acceleration: number;
   maxSpeed: number;

@@ -1,20 +1,18 @@
 import Bullet from "./bullet/Bullet";
 import Player from "./Player";
-import { PerspectiveCamera, Scene as TScene, Vector3 } from "three";
+import { PerspectiveCamera, Vector3 } from "three";
 import { Size } from "../scenes/Scene";
 import { Key } from "../Key";
 import config from "../config";
 import Enemy from "./enemy/Enemy";
-export default class GameObjects {
-  readonly scene: TScene;
-  readonly camera: PerspectiveCamera;
+import RenderPath from "../renderPath/RenderPath";
+
+export default class MainPath extends RenderPath {
   private player: Player;
   private bullets: Bullet[];
   private enemy: Enemy;
   constructor(size: Size) {
-    this.scene = new TScene();
-
-    this.camera = new PerspectiveCamera(45, size.width / size.height, 1, 10000);
+    super(new PerspectiveCamera(45, size.width / size.height, 1, 10000));
     this.camera.position.z = 100;
     this.camera.lookAt(new Vector3(0, 0, 0));
 
@@ -35,10 +33,8 @@ export default class GameObjects {
         .copy(this.bullets[i].pos)
         .sub(this.enemy.pos)
         .length();
-      console.log(distance);
       if (distance < 5 || this.bullets[i].pos.x > 50) {
         this.scene.remove((this.bullets.splice(i, 1)[0] as Bullet).mesh);
-        console.log("delete");
         break;
       }
     }

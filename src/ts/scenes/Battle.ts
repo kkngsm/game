@@ -1,10 +1,22 @@
-import Objects from "../object/Objects";
+import { RGBAFormat, UnsignedByteType } from "three";
+import MainPath from "../object/MainPath";
+import { PostEffect } from "../postEffects/PostEffect";
+import { WebGLDefferdRenderTargets } from "../renderPath/WebGLDefferdRenderer";
 import { Scene, SceneProps, State } from "./Scene";
 export default class Battle extends Scene {
-  private objects: Objects;
+  private mainPath: MainPath;
+  private postPath: PostEffect;
+  private rawRender: WebGLDefferdRenderTargets;
   constructor(prop: SceneProps) {
     super(prop);
-    this.objects = new Objects(this.size);
+    this.mainPath = new MainPath(this.size);
+    this.rawRender = new WebGLDefferdRenderTargets(
+      this.size.width,
+      this.size.height,
+      [{ name: "color", type: UnsignedByteType, format: RGBAFormat }]
+    );
+
+    this.postPath = new PostEffect(this.size, this.rawRender.texture);
   }
 
   async run(): Promise<State> {
@@ -26,14 +38,18 @@ export default class Battle extends Scene {
   }
 
   private update(): void {
-    this.objects.update();
+    this.mainPath.update();
   }
   private draw(): void {
+    this.renderer.setRenderTarget(this.rawRender);
+    this.renderer.clear();
+    this.renderer.render(this.mainPath.scene, this.mainPath.camera);
+
     this.renderer.setRenderTarget(null);
     this.renderer.clear();
-    this.renderer.render(this.objects.scene, this.objects.camera);
+    this.renderer.render(this.postPath.scene, this.postPath.camera);
   }
   private operation(time: number) {
-    this.objects.operation(time, this.key);
+    this.mainPath.operation(time, this.key);
   }
 }
