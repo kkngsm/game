@@ -1,15 +1,18 @@
 import { BoxGeometry, Vector2 } from "three";
 import { Key } from "../Key";
 import config from "../config";
-import GameObject from "./Object";
+import GameObject from "./GameObject";
 import createStanderdMaterial from "../materials/StanderdMaterial";
 export default class Player extends GameObject {
+  size: number;
   lastFiredTime: number;
   speed: Vector2;
   constructor() {
-    const box = new BoxGeometry(10, 10, 10);
+    const size = 10;
+    const box = new BoxGeometry(size, 10, 10);
     const mat = createStanderdMaterial(0x1ec876);
     super(box, mat);
+    this.size = size;
     this.speed = new Vector2(0, 0);
     this.lastFiredTime = -10;
   }
