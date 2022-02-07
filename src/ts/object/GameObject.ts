@@ -6,6 +6,7 @@ export default abstract class GameObject {
   constructor(geo: BufferGeometry, mat: Material) {
     this.mesh = new Mesh(geo, mat);
   }
+  abstract update(time: number): void;
   get pos(): Vector3 {
     return this.mesh.position;
   }

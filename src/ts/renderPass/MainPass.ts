@@ -5,6 +5,7 @@ import { Key } from "../Key";
 import config from "../config";
 import Enemy from "../object/enemy/Enemy";
 import RenderPass from "./RenderPass";
+import { QTree } from "../QTree/QTree";
 
 /**
  * メインの処理のクラス
@@ -15,7 +16,7 @@ export default class MainPath extends RenderPass {
   private areaDownnerLeft: Vector2;
 
   private player: Player;
-  private bullets: Bullet[];
+  private bullets: QTree<Bullet>;
   private enemy: Enemy;
   /**
    * @param windowSize 画面サイズ
@@ -32,7 +33,7 @@ export default class MainPath extends RenderPass {
     this.areaSize = new Vector2(areaHeight * aspect, areaHeight);
     this.areaDownnerLeft = this.areaSize.clone().multiplyScalar(-0.5);
 
-    this.bullets = [];
+    this.bullets = new QTree(this.areaDownnerLeft, this.areaSize);
     this.player = new Player();
     this.player.mesh.position.set(0, 0, 0);
 
@@ -44,20 +45,39 @@ export default class MainPath extends RenderPass {
    * 更新処理をする
    * 接触、ダメージなど
    */
-  update() {
-    this.bullets.forEach((e) => e.update());
-    this.player.update();
-    const len = this.bullets.length;
-    for (let i = 0; i < len; i = i + 1) {
-      const distance = new Vector3()
-        .copy(this.bullets[i].pos)
-        .sub(this.enemy.pos)
-        .length();
-      if (distance < 5 || this.bullets[i].pos.x > 50) {
-        this.scene.remove((this.bullets.splice(i, 1)[0] as Bullet).mesh);
-        break;
+  update(time: number) {
+    const tempBullets = new QTree<Bullet>(this.areaDownnerLeft, this.areaSize);
+    const cellslen = this.bullets.cells.length;
+    for (let mc = 0; mc < cellslen; mc++) {
+      const cell = this.bullets.cells[mc];
+      const oblen = cell.objects.length;
+      for (let i = 0; i < oblen; i++) {
+        cell.objects[i].update();
+        tempBullets.add(cell.objects[i]);
       }
     }
+    this.bullets = tempBullets;
+
+    this.player.update();
+    this.enemy.update(time);
+
+    const ChildrenCellsMortonCodes =
+      this.bullets.getOverlappingCellsMortonCodes(this.enemy);
+    const contactDistance = config.bullet.size + config.enemy.size;
+    ChildrenCellsMortonCodes.forEach((e) => {
+      const bullets = this.bullets.cells[e].objects;
+      const len = bullets.length;
+      for (let i = 0; i < len; i = i + 1) {
+        const distance = new Vector3()
+          .copy(bullets[i].pos)
+          .sub(this.enemy.pos)
+          .length();
+        if (distance < contactDistance || bullets[i].pos.x > 50) {
+          this.scene.remove((bullets.splice(i, 1)[0] as Bullet).mesh);
+          break;
+        }
+      }
+    });
   }
   /**
    * 操作による更新を行う
@@ -69,12 +89,9 @@ export default class MainPath extends RenderPass {
     if (key.space) {
       if (time - this.player.lastFiredTime > config.bullet.rate) {
         const bullet = new Bullet(this.player.pos);
-        this.bullets.push(bullet);
+        this.bullets.add(bullet);
         this.scene.add(bullet.mesh);
         this.player.lastFiredTime = time;
-        if (this.bullets.length > 100) {
-          this.scene.remove((this.bullets.shift() as Bullet).mesh);
-        }
       }
     }
   }

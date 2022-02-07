@@ -7,11 +7,15 @@ export class QTree<T extends GameObject> {
 
   constructor(private downnerLeft: Vector2, private areaSize: Vector2) {
     /**線形四分木に必要な要素数 */
-    const len = (4 ** config.QTree.maxLevel - 1) / 3;
+    const len = (4 ** (config.QTree.maxLevel + 1) - 1) / 3;
     this.cells = new Array<Cell<T>>(len);
     for (let i = 0; i < len; i++) {
       this.cells[i] = new Cell<T>(i);
     }
+  }
+  getOverlappingCellsMortonCodes<U extends GameObject>(a: U): number[] {
+    const aMc = this.getMortonCodeFromObject(a);
+    return [aMc, ...this.cells[aMc].getChildrenMortonCodes()];
   }
   /**
    * aをQTreeに追加
@@ -19,11 +23,7 @@ export class QTree<T extends GameObject> {
    * @returns 何番目に追加されたか
    */
   add(a: T) {
-    const pos = new Vector2(a.pos.x, a.pos.y);
-    const downnerLeft = new Vector2().copy(pos).subScalar(a.size / 2);
-    const upperRight = new Vector2().copy(pos).addScalar(a.size / 2);
-    const mc = this.getMortonCodefromRect(downnerLeft, upperRight);
-    // return this.cells[mc].add(a);
+    return this.cells[this.getMortonCodeFromObject(a)].add(a);
   }
   /**
    * mortonCodeのセルのindex番目のオブジェクトを削除
@@ -44,11 +44,22 @@ export class QTree<T extends GameObject> {
     this.add(this.remove(mortonCode, index));
   }
   /**
+   * オブジェクトからモートンコードを取得
+   * @param a
+   * @returns
+   */
+  private getMortonCodeFromObject<U extends GameObject>(a: U) {
+    const pos = new Vector2(a.pos.x, a.pos.y);
+    const downnerLeft = new Vector2().copy(pos).subScalar(a.size / 2);
+    const upperRight = new Vector2().copy(pos).addScalar(a.size / 2);
+    return this.getMortonCodefromRect(downnerLeft, upperRight);
+  }
+  /**
    * 点の位置するモートン符号を取得
    * @param point 位置
    * @returns モートン符号
    */
-  getMortonCodefromPoint(point: Vector2): number {
+  private getMortonCodefromPoint(point: Vector2): number {
     return this.index2MortonCode(this.getIndex(point));
   }
   /**
@@ -57,7 +68,7 @@ export class QTree<T extends GameObject> {
    * @param b 隅の位置ベクトル
    * @returns モートン符号
    */
-  getMortonCodefromRect(a: Vector2, b: Vector2): number {
+  private getMortonCodefromRect(a: Vector2, b: Vector2): number {
     const ma = this.getIndex(a);
     const mb = this.getIndex(b);
     if (ma === mb) {
@@ -111,8 +122,10 @@ export class QTree<T extends GameObject> {
 }
 
 class Cell<T extends GameObject> {
-  private objects: T[];
-  constructor(private mortonCode: number) {}
+  objects: T[];
+  constructor(private mortonCode: number) {
+    this.objects = [];
+  }
   /**
    * Cellにオブジェクトaを追加
    * @param a
@@ -138,7 +151,7 @@ class Cell<T extends GameObject> {
    * すべての親のモートン符号を取得
    * @returns モートン符号の配列
    */
-  getParentsMortonCode(): number[] {
+  getParentsMortonCodes(): number[] {
     const result: number[] = [];
     let index = this.mortonCode;
     const l = this.getLevel();
@@ -152,7 +165,7 @@ class Cell<T extends GameObject> {
    * すべての子のモートン符号を取得
    * @returns モートン符号の配列
    */
-  getChildrenMortonCode(): number[] {
+  getChildrenMortonCodes(): number[] {
     const result: number[] = [];
     let indexes = [this.mortonCode];
     for (let i = this.getLevel(); i < config.QTree.maxLevel; i++) {

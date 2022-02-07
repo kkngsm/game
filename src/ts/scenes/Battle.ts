@@ -37,7 +37,7 @@ export default class Battle extends Scene {
     return new Promise<void>((resolve) => {
       const loop = (time: number) => {
         this.operation(time);
-        this.update();
+        this.update(time);
         this.draw();
         if (!this.key.enter) {
           requestAnimationFrame(loop);
@@ -51,8 +51,8 @@ export default class Battle extends Scene {
     });
   }
 
-  private update(): void {
-    this.main.update();
+  private update(time: number): void {
+    this.main.update(time);
   }
   private draw(): void {
     this.renderer.setRenderTarget(this.rawRender);

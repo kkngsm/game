@@ -8,11 +8,14 @@ export default class Player extends GameObject {
   lastFiredTime: number;
   speed: Vector2;
   constructor() {
-    const size = 10;
-    const box = new BoxGeometry(size, size, size);
+    const box = new BoxGeometry(
+      config.player.size,
+      config.player.size,
+      config.player.size
+    );
     const mat = createStanderdMaterial(0x1ec876);
     super(box, mat);
-    this.size = size;
+    this.size = config.player.size;
     this.speed = new Vector2(0, 0);
     this.lastFiredTime = -10;
   }
