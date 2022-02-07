@@ -46,36 +46,27 @@ export default class MainPath extends RenderPass {
    * 接触、ダメージなど
    */
   update(time: number) {
-    const tempBullets = new QTree<Bullet>(this.areaDownnerLeft, this.areaSize);
-    const cellslen = this.bullets.cells.length;
-    for (let mc = 0; mc < cellslen; mc++) {
-      const cell = this.bullets.cells[mc];
-      const oblen = cell.objects.length;
-      for (let i = 0; i < oblen; i++) {
-        cell.objects[i].update();
-        tempBullets.add(cell.objects[i]);
+    this.bullets = this.bullets.allUpdate((e) => {
+      e.update(time);
+      if (e.pos.x > 50) {
+        this.scene.remove(e.mesh);
+        return false;
+      } else {
+        return true;
       }
-    }
-    this.bullets = tempBullets;
+    });
 
     this.player.update();
     this.enemy.update(time);
 
-    const ChildrenCellsMortonCodes =
-      this.bullets.getOverlappingCellsMortonCodes(this.enemy);
     const contactDistance = config.bullet.size + config.enemy.size;
-    ChildrenCellsMortonCodes.forEach((e) => {
-      const bullets = this.bullets.cells[e].objects;
-      const len = bullets.length;
-      for (let i = 0; i < len; i = i + 1) {
-        const distance = new Vector3()
-          .copy(bullets[i].pos)
-          .sub(this.enemy.pos)
-          .length();
-        if (distance < contactDistance || bullets[i].pos.x > 50) {
-          this.scene.remove((bullets.splice(i, 1)[0] as Bullet).mesh);
-          break;
-        }
+    this.bullets.cellUpdate(this.enemy, (e) => {
+      const distance = new Vector3().copy(e.pos).sub(this.enemy.pos).length();
+      if (distance < contactDistance) {
+        this.scene.remove(e.mesh);
+        return false;
+      } else {
+        return true;
       }
     });
   }

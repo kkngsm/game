@@ -13,9 +13,62 @@ export class QTree<T extends GameObject> {
       this.cells[i] = new Cell<T>(i);
     }
   }
+  /**
+   * すべての要素の更新(非破壊)
+   * @param callback 更新処理
+   * @returns 更新した新しいQTree
+   */
+  allUpdate(callback: (element: T) => boolean): QTree<T> {
+    const temp = new QTree<T>(this.downnerLeft, this.areaSize);
+    const cellslen = this.cells.length;
+    for (let mc = 0; mc < cellslen; mc++) {
+      const objects = this.cells[mc].objects;
+      const oblen = objects.length;
+      for (let i = 0; i < oblen; i++) {
+        const alive = callback(objects[i]);
+        if (alive) {
+          temp.add(objects[i]);
+        }
+      }
+    }
+    return temp;
+  }
+  /**
+   * aと重なっているセルの更新(非破壊)
+   * @param a オブジェクト
+   * @param callback 更新処理
+   * @returns 更新した新しいQTree
+   */
+  cellUpdate<U extends GameObject>(
+    a: U,
+    callback: (element: T) => boolean
+  ): QTree<T> {
+    const temp = new QTree<T>(this.downnerLeft, this.areaSize);
+    const ChildrenCellsMortonCodes = this.getOverlappingCellsMortonCodes(a);
+    ChildrenCellsMortonCodes.forEach((e) => {
+      const objects = this.cells[e].objects;
+      const len = objects.length;
+      for (let i = 0; i < len; i = i + 1) {
+        const alive = callback(objects[i]);
+        if (alive) {
+          temp.add(objects[i]);
+        }
+      }
+    });
+    return temp;
+  }
+  /**
+   * aに重なっているセルのモートン符号を取得
+   * @param a
+   * @returns セルのモートン符号の配列
+   */
   getOverlappingCellsMortonCodes<U extends GameObject>(a: U): number[] {
     const aMc = this.getMortonCodeFromObject(a);
-    return [aMc, ...this.cells[aMc].getChildrenMortonCodes()];
+    return [
+      aMc,
+      ...this.cells[aMc].getParentsMortonCodes(),
+      ...this.cells[aMc].getChildrenMortonCodes(),
+    ];
   }
   /**
    * aをQTreeに追加

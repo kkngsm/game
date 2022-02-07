@@ -12,7 +12,7 @@ export default class Bullet extends GameObject {
     this.size = config.bullet.size;
     this.mesh.position.set(pos.x, pos.y, pos.z);
   }
-  update() {
+  update(time: number) {
     this.mesh.position.x = this.mesh.position.x + 2;
   }
 }
