@@ -1,12 +1,12 @@
 type PlayerSetting = {
   acceleration: number;
   maxSpeed: number;
-  size: number;
+  radius: number;
 };
 
 type WeponsSetting = {
   rate: number;
-  size: number;
+  radius: number;
 };
 
 type QTreeSetting = {
@@ -14,7 +14,7 @@ type QTreeSetting = {
 };
 
 type EnemySetting = {
-  size: number;
+  radius: number;
 };
 
 type Config = {
@@ -31,14 +31,14 @@ const config: Config = {
   player: {
     acceleration: 0.1,
     maxSpeed: 0.5,
-    size: 10,
+    radius: 5,
   },
   bullet: {
     rate: 50,
-    size: 5,
+    radius: 2,
   },
   enemy: {
-    size: 10,
+    radius: 10,
   },
 } as const;
 export default config;

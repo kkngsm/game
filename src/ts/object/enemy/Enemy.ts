@@ -4,12 +4,12 @@ import createStanderdMaterial from "../../materials/StanderdMaterial";
 import GameObject from "../GameObject";
 
 export default class Enemy extends GameObject {
-  size: number;
+  radius: number;
   constructor() {
-    const box = new SphereGeometry(config.enemy.size, 32, 16);
+    const box = new SphereGeometry(config.enemy.radius, 32, 16);
     const mat = createStanderdMaterial(0xd52626);
     super(box, mat);
-    this.size = config.enemy.size;
+    this.radius = config.enemy.radius;
     this.mesh.position.set(20, 0, 0);
   }
   update(time: number) {

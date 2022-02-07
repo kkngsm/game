@@ -4,18 +4,18 @@ import config from "../config";
 import GameObject from "./GameObject";
 import createStanderdMaterial from "../materials/StanderdMaterial";
 export default class Player extends GameObject {
-  size: number;
+  radius: number;
   lastFiredTime: number;
   speed: Vector2;
   constructor() {
     const box = new BoxGeometry(
-      config.player.size,
-      config.player.size,
-      config.player.size
+      config.player.radius * 2,
+      config.player.radius * 2,
+      config.player.radius * 2
     );
     const mat = createStanderdMaterial(0x1ec876);
     super(box, mat);
-    this.size = config.player.size;
+    this.radius = config.player.radius;
     this.speed = new Vector2(0, 0);
     this.lastFiredTime = -10;
   }

@@ -58,19 +58,6 @@ export class QTree<T extends GameObject> {
     return temp;
   }
   /**
-   * aに重なっているセルのモートン符号を取得
-   * @param a
-   * @returns セルのモートン符号の配列
-   */
-  getOverlappingCellsMortonCodes<U extends GameObject>(a: U): number[] {
-    const aMc = this.getMortonCodeFromObject(a);
-    return [
-      aMc,
-      ...this.cells[aMc].getParentsMortonCodes(),
-      ...this.cells[aMc].getChildrenMortonCodes(),
-    ];
-  }
-  /**
    * aをQTreeに追加
    * @param a 追加するオブジェクト
    * @returns 何番目に追加されたか
@@ -97,14 +84,27 @@ export class QTree<T extends GameObject> {
     this.add(this.remove(mortonCode, index));
   }
   /**
+   * aに重なっているセルのモートン符号を取得
+   * @param a
+   * @returns セルのモートン符号の配列
+   */
+  private getOverlappingCellsMortonCodes<U extends GameObject>(a: U): number[] {
+    const aMc = this.getMortonCodeFromObject(a);
+    return [
+      aMc,
+      ...this.cells[aMc].getParentsMortonCodes(),
+      ...this.cells[aMc].getChildrenMortonCodes(),
+    ];
+  }
+  /**
    * オブジェクトからモートンコードを取得
    * @param a
    * @returns
    */
   private getMortonCodeFromObject<U extends GameObject>(a: U) {
     const pos = new Vector2(a.pos.x, a.pos.y);
-    const downnerLeft = new Vector2().copy(pos).subScalar(a.size / 2);
-    const upperRight = new Vector2().copy(pos).addScalar(a.size / 2);
+    const downnerLeft = new Vector2().copy(pos).subScalar(a.radius);
+    const upperRight = new Vector2().copy(pos).addScalar(a.radius);
     return this.getMortonCodefromRect(downnerLeft, upperRight);
   }
   /**
@@ -243,16 +243,6 @@ class Cell<T extends GameObject> {
    */
   private getLevel(): number {
     return Math.floor(Math.log2(3 * this.mortonCode + 1) / 2);
-  }
-  output() {
-    const result: [number | string] = [this.mortonCode];
-    for (let i = config.QTree.maxLevel - 1; i >= 0; i--) {
-      result.push(
-        `level ${config.QTree.maxLevel - i}:`,
-        (this.mortonCode >> (i * 2)) & 0b11
-      );
-    }
-    console.log(...result);
   }
 }
 

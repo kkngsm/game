@@ -59,7 +59,7 @@ export default class MainPath extends RenderPass {
     this.player.update();
     this.enemy.update(time);
 
-    const contactDistance = config.bullet.size + config.enemy.size;
+    const contactDistance = config.bullet.radius + config.enemy.radius;
     this.bullets.cellUpdate(this.enemy, (e) => {
       const distance = new Vector3().copy(e.pos).sub(this.enemy.pos).length();
       if (distance < contactDistance) {

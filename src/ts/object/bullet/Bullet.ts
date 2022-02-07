@@ -4,12 +4,12 @@ import createStanderdMaterial from "../../materials/StanderdMaterial";
 import GameObject from "../GameObject";
 
 export default class Bullet extends GameObject {
-  size: number;
+  radius: number;
   constructor(pos: Vector3) {
-    const box = new IcosahedronGeometry(config.bullet.size, 0);
+    const box = new IcosahedronGeometry(config.bullet.radius, 0);
     const mat = createStanderdMaterial(0xa42d2d);
     super(box, mat);
-    this.size = config.bullet.size;
+    this.radius = config.bullet.radius;
     this.mesh.position.set(pos.x, pos.y, pos.z);
   }
   update(time: number) {
