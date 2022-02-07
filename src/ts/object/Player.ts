@@ -9,7 +9,7 @@ export default class Player extends GameObject {
   speed: Vector2;
   constructor() {
     const size = 10;
-    const box = new BoxGeometry(size, 10, 10);
+    const box = new BoxGeometry(size, size, size);
     const mat = createStanderdMaterial(0x1ec876);
     super(box, mat);
     this.size = size;

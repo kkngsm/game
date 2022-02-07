@@ -1,9 +1,9 @@
-import { WebGLRenderer } from "three";
+import { Vector2, WebGLRenderer } from "three";
 import "../sass/style.sass";
 import { Key } from "./Key";
 import Battle from "./scenes/Battle";
 import Result from "./scenes/Result";
-import { SceneProps, Size, State } from "./scenes/Scene";
+import { SceneProps, State } from "./scenes/Scene";
 import Title from "./scenes/Title";
 class Game {
   async main() {
@@ -13,14 +13,16 @@ class Game {
     const renderer = new WebGLRenderer({ canvas });
     renderer.autoClear = true;
     renderer.setClearAlpha(0);
-    const size: Size = {
-      width: canvas.clientWidth,
-      height: canvas.clientHeight,
-    };
+    const windowSize = new Vector2(canvas.clientWidth, canvas.clientHeight);
+    const windowDownnerLeft = new Vector2(
+      -canvas.clientWidth / 2,
+      -canvas.clientHeight / 2
+    );
     const props: SceneProps = {
       key,
       renderer,
-      size,
+      windowSize,
+      windowDownnerLeft,
     };
     const title = new Title(props);
     const battle = new Battle(props);

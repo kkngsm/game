@@ -1,4 +1,4 @@
-import { WebGLRenderer } from "three";
+import { Vector2, WebGLRenderer } from "three";
 import { Key } from "../Key";
 
 export type State = "Title" | "Battle" | "Result" | "End";
@@ -6,19 +6,18 @@ export type State = "Title" | "Battle" | "Result" | "End";
 export type SceneProps = {
   key: Key;
   renderer: WebGLRenderer;
-  size: Size;
-};
-export type Size = {
-  width: number;
-  height: number;
+  windowSize: Vector2;
+  windowDownnerLeft: Vector2;
 };
 export abstract class Scene {
   protected key: Key;
   protected renderer: WebGLRenderer;
-  protected size: Size;
-  constructor({ key, renderer, size }: SceneProps) {
+  protected windowSize: Vector2;
+  protected windowDownnerLeft: Vector2;
+  constructor({ key, renderer, windowSize, windowDownnerLeft }: SceneProps) {
     this.key = key;
     this.renderer = renderer;
-    this.size = size;
+    this.windowSize = windowSize;
+    this.windowDownnerLeft = windowDownnerLeft;
   }
 }

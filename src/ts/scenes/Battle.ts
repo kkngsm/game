@@ -9,10 +9,10 @@ export default class Battle extends Scene {
   private rawRender: WebGLDefferdRenderTargets;
   constructor(prop: SceneProps) {
     super(prop);
-    this.main = new MainPass(this.size);
+    this.main = new MainPass(this.windowSize);
     this.rawRender = new WebGLDefferdRenderTargets(
-      this.size.width,
-      this.size.height,
+      this.windowSize.width,
+      this.windowSize.height,
       [
         {
           name: "albedo",
@@ -30,7 +30,7 @@ export default class Battle extends Scene {
         },
       ]
     );
-    this.post = new PostPass(this.size, this.rawRender);
+    this.post = new PostPass(this.windowSize, this.rawRender);
   }
 
   async run(): Promise<State> {

@@ -15,7 +15,6 @@ import {
   WebGLRenderTarget,
 } from "three";
 import RenderPass from "./RenderPass";
-import { Size } from "../scenes/Scene";
 import vs from "../../glsl/postpass.vert";
 import toonfs from "../../glsl/toon.frag";
 import bloomfs from "../../glsl/bloom.frag";
@@ -41,16 +40,16 @@ export class PostPass extends RenderPass {
   private materials: Material[];
   private mesh: Mesh;
   /**
-   * @param size 画面サイズ
+   * @param windowSize 画面サイズ
    * @param prevRenderTargets 前処理でのレンダリング結果
    */
   constructor(
-    size: Size,
+    windowSize: Vector2,
     private prevRenderTargets: WebGLDefferdRenderTargets
   ) {
     super(new OrthographicCamera(-0.5, 0.5, 0.5, -0.5, -10000, 10000));
     this.camera.position.z = 100;
-    const wrt = new WebGLRenderTarget(size.width, size.height, {
+    const wrt = new WebGLRenderTarget(windowSize.x, windowSize.y, {
       minFilter: LinearFilter,
       magFilter: LinearFilter,
       format: RGBAFormat,
@@ -60,7 +59,10 @@ export class PostPass extends RenderPass {
 
     this.uniforms = {
       cameraPos: { type: "v3", value: this.camera.position },
-      resolution: { type: "v2", value: new Vector2(size.width, size.height) },
+      resolution: {
+        type: "v2",
+        value: new Vector2(windowSize.x, windowSize.y),
+      },
       albedo: { type: "t", value: prevRenderTargets.texture[0] },
       normal: { type: "t", value: prevRenderTargets.texture[1] },
     };

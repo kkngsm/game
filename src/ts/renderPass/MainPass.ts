@@ -1,7 +1,6 @@
 import Bullet from "../object/bullet/Bullet";
 import Player from "../object/Player";
-import { PerspectiveCamera, Vector3 } from "three";
-import { Size } from "../scenes/Scene";
+import { PerspectiveCamera, Vector2, Vector3 } from "three";
 import { Key } from "../Key";
 import config from "../config";
 import Enemy from "../object/enemy/Enemy";
@@ -12,16 +11,26 @@ import RenderPass from "./RenderPass";
  * 遅延なのでalbedo, normalを出力
  */
 export default class MainPath extends RenderPass {
+  private areaSize: Vector2;
+  private areaDownnerLeft: Vector2;
+
   private player: Player;
   private bullets: Bullet[];
   private enemy: Enemy;
   /**
-   * @param size 画面サイズ
+   * @param windowSize 画面サイズ
    */
-  constructor(size: Size) {
-    super(new PerspectiveCamera(45, size.width / size.height, 1, 10000));
-    this.camera.position.z = 100;
+  constructor(windowSize: Vector2) {
+    const fov = 45;
+    const cameraZ = 100;
+    const aspect = windowSize.x / windowSize.y;
+    super(new PerspectiveCamera(fov, aspect, 1, 10000));
+    this.camera.position.z = cameraZ;
     this.camera.lookAt(new Vector3(0, 0, 0));
+
+    const areaHeight = Math.tan((fov / 180) * 0.5 * Math.PI) * cameraZ * 2;
+    this.areaSize = new Vector2(areaHeight * aspect, areaHeight);
+    this.areaDownnerLeft = this.areaSize.clone().multiplyScalar(-0.5);
 
     this.bullets = [];
     this.player = new Player();
