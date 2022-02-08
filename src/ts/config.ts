@@ -39,7 +39,7 @@ const config: Config = {
     radius: 2,
   },
   enemy: {
-    radius: 10,
+    radius: 20,
     particleNumSqrt: 512,
   },
 } as const;

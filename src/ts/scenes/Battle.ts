@@ -55,10 +55,8 @@ export default class Battle extends Scene {
     this.main.update(time);
   }
   private draw(): void {
-    this.renderer.setRenderTarget(this.rawRender);
-    this.renderer.render(this.main.scene, this.main.camera);
-
-    this.post.render(this.renderer);
+    this.main.render(this.renderer, this.rawRender);
+    this.post.render(this.renderer, null);
   }
   private operation(time: number) {
     this.main.operation(time, this.key);

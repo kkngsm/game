@@ -98,7 +98,10 @@ export class PostPass extends RenderPass {
    * レンダリングをする。
    * @param renderer WebGLRenderer
    */
-  render(renderer: WebGLRenderer) {
+  render(
+    renderer: WebGLRenderer,
+    renderTarget: WebGLRenderTarget | WebGLDefferdRenderTargets | null
+  ): void {
     this.uniforms.albedo.value = this.prevRenderTargets.texture[0];
     const maxIndex = this.materials.length - 1;
     for (let i = 0; i < maxIndex; i++) {
@@ -110,7 +113,7 @@ export class PostPass extends RenderPass {
     }
 
     this.mesh.material = this.materials[maxIndex];
-    renderer.setRenderTarget(null);
+    renderer.setRenderTarget(renderTarget);
     renderer.render(this.scene, this.camera);
   }
 }

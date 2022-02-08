@@ -1,11 +1,18 @@
 import Bullet from "../object/bullet/Bullet";
 import Player from "../object/Player";
-import { PerspectiveCamera, Vector2, Vector3 } from "three";
+import {
+  PerspectiveCamera,
+  Vector2,
+  Vector3,
+  WebGLRenderer,
+  WebGLRenderTarget,
+} from "three";
 import { Key } from "../Key";
 import config from "../config";
 import Enemy from "../object/enemy/Enemy";
 import RenderPass from "./RenderPass";
 import { QTree } from "../QTree/QTree";
+import { WebGLDefferdRenderTargets } from "../WebGLDefferdRenderTargets";
 
 /**
  * メインの処理のクラス
@@ -85,5 +92,14 @@ export default class MainPath extends RenderPass {
         this.player.lastFiredTime = time;
       }
     }
+  }
+  render(
+    renderer: WebGLRenderer,
+    renderTarget: WebGLRenderTarget | WebGLDefferdRenderTargets | null
+  ): void {
+    this.enemy.render(renderer);
+    renderer.setRenderTarget(renderTarget);
+    renderer.clear();
+    renderer.render(this.scene, this.camera);
   }
 }

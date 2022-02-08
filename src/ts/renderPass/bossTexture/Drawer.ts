@@ -5,8 +5,6 @@ import {
   LinearFilter,
   OrthographicCamera,
   Points,
-  PointsMaterial,
-  RawShaderMaterial,
   RepeatWrapping,
   RGBAFormat,
   Scene as TScene,
@@ -34,7 +32,7 @@ export class Drawer {
     const particleNum = particleNumSqrt * particleNumSqrt;
     this.camera = new OrthographicCamera(-0.5, 0.5, 0.5, -0.5, -10000, 10000);
     this.camera.position.z = 100;
-    this.result = new WebGLRenderTarget(1024, 1024, {
+    this.result = new WebGLRenderTarget(512, 512, {
       minFilter: LinearFilter,
       magFilter: LinearFilter,
       wrapS: RepeatWrapping,
@@ -95,10 +93,6 @@ export class Drawer {
   render(renderer: WebGLRenderer, moved: Texture): Texture {
     this.uniforms.dataTex.value = moved;
     renderer.setRenderTarget(this.result);
-    renderer.clear();
-    renderer.render(this.scene, this.camera);
-
-    renderer.setRenderTarget(null);
     renderer.clear();
     renderer.render(this.scene, this.camera);
     return this.result.texture;

@@ -89,17 +89,16 @@ export class Mover {
       })
     );
     this.data.push(this.data[0].clone());
-    this.data[0].texture = dataTex;
     this.dataIndex = 0;
   }
   render(renderer: WebGLRenderer, drew: Texture) {
-    this.uniforms.dataTex.value = this.data[this.dataIndex].texture;
     this.uniforms.drawTex.value = drew;
 
     this.dataIndex = (this.dataIndex + 1) % 2;
     renderer.setRenderTarget(this.data[this.dataIndex]);
     renderer.clear();
     renderer.render(this.scene, this.camera);
+    this.uniforms.dataTex.value = this.data[this.dataIndex].texture;
     return this.data[this.dataIndex].texture;
   }
 }
