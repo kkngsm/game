@@ -27,7 +27,7 @@ class Game {
       windowDownnerLeft,
     };
     const title = new Title(props);
-    const battle = new Battle(props);
+    const battle = await Battle.init(props);
     const result = new Result(props);
     //状態遷移によるシーン管理
     let currentState: State = "Title";

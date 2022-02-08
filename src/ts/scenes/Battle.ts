@@ -9,28 +9,11 @@ export default class Battle extends Scene {
   private rawRender: WebGLDefferdRenderTargets;
   constructor(prop: SceneProps) {
     super(prop);
-    this.main = new MainPass(this.windowSize);
-    this.rawRender = new WebGLDefferdRenderTargets(
-      this.windowSize.width,
-      this.windowSize.height,
-      [
-        {
-          name: "albedo",
-          minFilter: LinearFilter,
-          magFilter: LinearFilter,
-          type: UnsignedByteType,
-          format: RGBAFormat,
-        },
-        {
-          name: "normal",
-          minFilter: LinearFilter,
-          magFilter: LinearFilter,
-          type: UnsignedByteType,
-          format: RGBAFormat,
-        },
-      ]
-    );
-    this.post = new PostPass(this.windowSize, this.rawRender);
+  }
+  public static async init(props: SceneProps) {
+    const battle = new Battle(props);
+    await battle.set();
+    return battle;
   }
 
   async run(): Promise<State> {
@@ -60,5 +43,29 @@ export default class Battle extends Scene {
   }
   private operation(time: number) {
     this.main.operation(time, this.key);
+  }
+  private async set() {
+    this.main = await MainPass.init(this.windowSize);
+    this.rawRender = new WebGLDefferdRenderTargets(
+      this.windowSize.width,
+      this.windowSize.height,
+      [
+        {
+          name: "albedo",
+          minFilter: LinearFilter,
+          magFilter: LinearFilter,
+          type: UnsignedByteType,
+          format: RGBAFormat,
+        },
+        {
+          name: "normal",
+          minFilter: LinearFilter,
+          magFilter: LinearFilter,
+          type: UnsignedByteType,
+          format: RGBAFormat,
+        },
+      ]
+    );
+    this.post = new PostPass(this.windowSize, this.rawRender);
   }
 }

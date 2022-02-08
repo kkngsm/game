@@ -1,6 +1,7 @@
 import Bullet from "../object/bullet/Bullet";
 import Player from "../object/Player";
 import {
+  Group,
   PerspectiveCamera,
   Vector2,
   Vector3,
@@ -13,7 +14,6 @@ import Enemy from "../object/enemy/Enemy";
 import RenderPass from "./RenderPass";
 import { QTree } from "../QTree/QTree";
 import { WebGLDefferdRenderTargets } from "../WebGLDefferdRenderTargets";
-
 /**
  * メインの処理のクラス
  * 遅延なのでalbedo, normalを出力
@@ -39,14 +39,11 @@ export default class MainPath extends RenderPass {
     const areaHeight = Math.tan((fov / 180) * 0.5 * Math.PI) * cameraZ * 2;
     this.areaSize = new Vector2(areaHeight * aspect, areaHeight);
     this.areaDownnerLeft = this.areaSize.clone().multiplyScalar(-0.5);
-
-    this.bullets = new QTree(this.areaDownnerLeft, this.areaSize);
-    this.player = new Player();
-    this.player.mesh.position.set(0, 0, 0);
-
-    this.enemy = new Enemy();
-
-    this.scene.add(this.player.mesh, this.enemy.mesh);
+  }
+  public static async init(windowSize: Vector2): Promise<MainPath> {
+    const main = new MainPath(windowSize);
+    await main.setObjects();
+    return main;
   }
   /**
    * 更新処理をする
@@ -101,5 +98,14 @@ export default class MainPath extends RenderPass {
     renderer.setRenderTarget(renderTarget);
     renderer.clear();
     renderer.render(this.scene, this.camera);
+  }
+  private async setObjects() {
+    this.bullets = new QTree(this.areaDownnerLeft, this.areaSize);
+    this.player = await Player.init();
+    this.player.mesh.position.set(0, 0, 0);
+
+    this.enemy = new Enemy();
+
+    this.scene.add(this.player.mesh, this.enemy.mesh);
   }
 }

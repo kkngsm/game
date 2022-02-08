@@ -1,10 +1,12 @@
-import { BufferGeometry, Material, Mesh, Vector3 } from "three";
+import { BufferGeometry, Group, Material, Mesh, Vector3 } from "three";
 
 export default abstract class GameObject {
   abstract radius: number;
-  mesh: Mesh;
-  constructor(geo: BufferGeometry, mat: Material) {
-    this.mesh = new Mesh(geo, mat);
+  mesh: Mesh | Group;
+  constructor(geo?: BufferGeometry, mat?: Material) {
+    if (geo !== undefined) {
+      this.mesh = new Mesh(geo, mat);
+    }
   }
   abstract update(time: number): void;
   get pos(): Vector3 {

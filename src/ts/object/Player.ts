@@ -1,4 +1,5 @@
-import { BoxGeometry, Vector2 } from "three";
+import { BoxGeometry, Group, Vector2 } from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { Key } from "../Key";
 import config from "../config";
 import GameObject from "./GameObject";
@@ -7,17 +8,30 @@ export default class Player extends GameObject {
   radius: number;
   lastFiredTime: number;
   speed: Vector2;
-  constructor() {
-    const box = new BoxGeometry(
-      config.player.radius * 2,
-      config.player.radius * 2,
-      config.player.radius * 2
-    );
-    const mat = createStanderdMaterial(0x1ec876);
-    super(box, mat);
+  constructor(model: Group) {
+    super();
+    this.mesh = model;
     this.radius = config.player.radius;
     this.speed = new Vector2(0, 0);
     this.lastFiredTime = -10;
+  }
+  public static async init(): Promise<Player> {
+    const loader = new GLTFLoader();
+    const url = "../../assets/player.glb";
+    const model = await (() => {
+      return new Promise<Group>((resolve) => {
+        loader.load(
+          url,
+          (gltf) => {
+            resolve(gltf.scene);
+          },
+          (err) => {
+            console.error(err);
+          }
+        );
+      });
+    })();
+    return new Player(model);
   }
   operation(key: Key) {
     /*加速*/
