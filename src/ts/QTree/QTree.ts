@@ -220,9 +220,9 @@ class Cell<T extends GameObject> {
    */
   getChildrenMortonCodes(): number[] {
     const result: number[] = [];
-    let indexes = [this.mortonCode];
+    let indices = [this.mortonCode];
     for (let i = this.getLevel(); i < config.QTree.maxLevel; i++) {
-      indexes = indexes
+      indices = indices
         .map((index: number) => {
           const childrenIndexes = [
             index * 4 + 1,

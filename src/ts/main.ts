@@ -12,7 +12,9 @@ class Game {
     const key = new Key();
     const renderer = new WebGLRenderer({ canvas });
     renderer.autoClear = true;
-    renderer.setClearAlpha(0);
+    // renderer.setClearAlpha(0);
+    renderer.extensions.get("EXT_color_buffer_float");
+
     const windowSize = new Vector2(canvas.clientWidth, canvas.clientHeight);
     const windowDownnerLeft = new Vector2(
       -canvas.clientWidth / 2,

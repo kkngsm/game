@@ -15,10 +15,10 @@ import {
   WebGLRenderTarget,
 } from "three";
 import RenderPass from "./RenderPass";
-import vs from "../../glsl/postpass.vert";
-import toonfs from "../../glsl/toon.frag";
-import bloomfs from "../../glsl/bloom.frag";
-import fxaafs from "../../glsl/fxaa.frag";
+import vs from "../../glsl/postEffects/postpass.vert";
+import toonfs from "../../glsl/postEffects/toon.frag";
+import bloomfs from "../../glsl/postEffects/bloom.frag";
+import fxaafs from "../../glsl/postEffects/fxaa.frag";
 import {
   renderInfo,
   WebGLDefferdRenderTargets,
