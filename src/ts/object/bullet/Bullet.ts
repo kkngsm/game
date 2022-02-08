@@ -10,9 +10,9 @@ export default class Bullet extends GameObject {
     const mat = createStanderdMaterial(0xa42d2d);
     super(box, mat);
     this.radius = config.bullet.radius;
-    this.mesh.position.set(pos.x, pos.y, pos.z);
+    this.model.position.set(pos.x, pos.y, pos.z);
   }
   update(time: number) {
-    this.mesh.position.x = this.mesh.position.x + 2;
+    this.model.position.x = this.model.position.x + 2;
   }
 }

@@ -68,7 +68,11 @@ const setting = {
       {
         test: /\.(glsl|vs|fs|vert|frag)$/,
         exclude: /node_modules/,
-        use: ["raw-loader"],
+        type: "asset/source",
+      },
+      {
+        test: /\.(png|jpe?g|gif|glb|gltf)$/i,
+        type: "asset/resource",
       },
     ],
   },

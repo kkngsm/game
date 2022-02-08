@@ -25,10 +25,10 @@ export default class Enemy extends GameObject {
     this.texture = tex;
     this.uniforms = uniforms;
     this.radius = config.enemy.radius;
-    this.mesh.position.set(20, 0, 0);
+    this.model.position.set(20, 0, 0);
   }
   update(time: number) {
-    this.mesh.position.set(20, Math.sin(time * 0.001) * 10, 0);
+    this.model.position.set(20, Math.sin(time * 0.001) * 10, 0);
   }
   render(renderer: WebGLRenderer) {
     this.uniforms.tex.value = this.texture.render(renderer);
