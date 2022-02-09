@@ -62,16 +62,19 @@ export default class MainPath extends RenderPass {
     this.player.update();
     this.enemy.update(time);
 
+    // enemyとの当たり判定
     const contactDistance = config.bullet.radius + config.enemy.radius;
-    this.bullets.cellUpdate(this.enemy, (e) => {
+    this.bullets = this.bullets.cellUpdate(this.enemy, (e) => {
       const distance = new Vector3().copy(e.pos).sub(this.enemy.pos).length();
       if (distance < contactDistance) {
         this.scene.remove(e.model);
+        this.enemy.hp.damage(1);
         return false;
       } else {
         return true;
       }
     });
+    return !this.enemy.hp.isDead();
   }
   /**
    * 操作による更新を行う
@@ -97,6 +100,9 @@ export default class MainPath extends RenderPass {
     renderer.setRenderTarget(renderTarget);
     renderer.clear();
     renderer.render(this.scene, this.camera);
+  }
+  getEnemyHp(): number {
+    return this.enemy.hp.hp / this.enemy.hp.maxHp;
   }
   private async setObjects() {
     this.bullets = new QTree(this.areaDownnerLeft, this.areaSize);

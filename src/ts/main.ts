@@ -8,19 +8,23 @@ import Title from "./scenes/Title";
 class Game {
   async main() {
     const canvas = <HTMLCanvasElement>document.getElementById("canvas");
-
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
     const key = new Key();
-    const renderer = new WebGLRenderer({ canvas });
+
+    const windowSize = new Vector2(canvas.clientWidth, canvas.clientHeight);
+
+    const renderer = new WebGLRenderer();
     renderer.autoClear = true;
     // renderer.setClearAlpha(0);
     renderer.extensions.get("EXT_color_buffer_float");
-
-    const windowSize = new Vector2(canvas.clientWidth, canvas.clientHeight);
+    renderer.setSize(windowSize.x, windowSize.y);
     const windowDownnerLeft = new Vector2(
       -canvas.clientWidth / 2,
       -canvas.clientHeight / 2
     );
     const props: SceneProps = {
+      ctx2D: canvas.getContext("2d") as CanvasRenderingContext2D,
       key,
       renderer,
       windowSize,

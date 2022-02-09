@@ -14,12 +14,15 @@ import GameObject from "./GameObject";
 import vs from "../../glsl/standerd.vert";
 import fs from "../../glsl/gltf.frag";
 import playerModel from "../../assets/models/player.glb";
+import { Hp } from "./hp";
 export default class Player extends GameObject {
+  hp: Hp;
   radius: number;
   lastFiredTime: number;
   speed: Vector2;
   constructor() {
     super();
+    this.hp = new Hp(10);
     this.radius = config.player.radius;
     this.speed = new Vector2(0, 0);
     this.lastFiredTime = -10;

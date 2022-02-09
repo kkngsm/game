@@ -1,11 +1,4 @@
-import {
-  GLSL3,
-  Group,
-  Mesh,
-  RawShaderMaterial,
-  Uniform,
-  WebGLRenderer,
-} from "three";
+import { GLSL3, Group, Mesh, RawShaderMaterial, WebGLRenderer } from "three";
 import config from "../../config";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { BossTexture } from "../../renderPass/bossTexture/BossTexture";
@@ -14,13 +7,16 @@ import vs from "../../../glsl/standerd.vert";
 import fs from "../../../glsl/gltf.frag";
 import bossModel from "../../../assets/models/boss.glb";
 import createStanderdMaterial from "../../materials/StanderdMaterial";
+import { Hp } from "../hp";
 
 export default class Enemy extends GameObject {
+  hp: Hp;
   radius: number;
   texture: BossTexture;
   uniforms: any;
   constructor() {
     super();
+    this.hp = new Hp(20);
     this.texture = new BossTexture();
     this.uniforms = { tex: { type: "t", value: undefined } };
     this.radius = config.enemy.radius;
