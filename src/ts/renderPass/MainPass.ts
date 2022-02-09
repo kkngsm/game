@@ -103,7 +103,7 @@ export default class MainPath extends RenderPass {
     this.player = await Player.init();
     this.player.model.position.set(0, 0, 0);
 
-    this.enemy = new Enemy();
+    this.enemy = await Enemy.init();
 
     this.scene.add(this.player.model, this.enemy.model);
   }

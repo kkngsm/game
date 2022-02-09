@@ -25,25 +25,8 @@ export default class Player extends GameObject {
     this.lastFiredTime = -10;
   }
   public static async init(): Promise<Player> {
-    const loader = new GLTFLoader();
-    const model = await (() => {
-      return new Promise<Group>((resolve) => {
-        loader.load(
-          playerModel,
-          (gltf) => {
-            resolve(gltf.scene);
-          },
-          (xhr) => {
-            console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
-          },
-          (err) => {
-            console.error("Player gltf Model loading Error:", err);
-          }
-        );
-      });
-    })();
     const player = new Player();
-    player.set(model);
+    await player.set();
     return player;
   }
   operation(key: Key) {
@@ -79,7 +62,24 @@ export default class Player extends GameObject {
     this.model.position.y += this.speed.y;
     this.speed.multiplyScalar(0.9);
   }
-  private set(model: Group) {
+  private async set() {
+    const loader = new GLTFLoader();
+    const model = await (() => {
+      return new Promise<Group>((resolve) => {
+        loader.load(
+          playerModel,
+          (gltf) => {
+            resolve(gltf.scene);
+          },
+          (xhr) => {
+            console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+          },
+          (err) => {
+            console.error("Player gltf Model loading Error:", err);
+          }
+        );
+      });
+    })();
     model.traverse((object) => {
       if ((object as Mesh).isMesh) {
         const tex = ((object as Mesh).material as MeshBasicMaterial).map;
