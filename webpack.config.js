@@ -9,7 +9,7 @@ const pugFiles = globule.find("src/pug/*.pug", {
 
 const enabledSourceMap = true;
 const setting = {
-  mode: "development",
+  mode: process.env.NODE_ENV,
 
   entry: "./src/ts/main.ts",
   output: {

@@ -38,13 +38,13 @@ class Game {
     stateMachine: for (;;) {
       switch (currentState) {
         case "Title":
-          currentState = title.run();
+          currentState = await title.run();
           break;
         case "Battle":
           currentState = await battle.run();
           break;
         case "Result":
-          currentState = result.run();
+          currentState = await result.run();
           break;
         case "End":
           console.log(currentState);
