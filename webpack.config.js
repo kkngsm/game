@@ -17,6 +17,7 @@ const setting = {
     path: `${__dirname}/dist`,
     // 出力ファイル名
     filename: "main.js",
+    assetModuleFilename: "assets/[hash]",
   },
   module: {
     rules: [
@@ -71,7 +72,7 @@ const setting = {
         type: "asset/source",
       },
       {
-        test: /\.(png|jpe?g|gif|glb|gltf)$/i,
+        test: /\.(glb|gltf)$/,
         type: "asset/resource",
       },
     ],

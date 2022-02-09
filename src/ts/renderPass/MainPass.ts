@@ -1,7 +1,6 @@
 import Bullet from "../object/bullet/Bullet";
 import Player from "../object/Player";
 import {
-  Group,
   PerspectiveCamera,
   Vector2,
   Vector3,
@@ -10,7 +9,7 @@ import {
 } from "three";
 import { Key } from "../Key";
 import config from "../config";
-import Enemy from "../object/enemy/Enemy";
+import Enemy from "../object/Enemy/Enemy";
 import RenderPass from "./RenderPass";
 import { QTree } from "../QTree/QTree";
 import { WebGLDefferdRenderTargets } from "../WebGLDefferdRenderTargets";
@@ -53,7 +52,7 @@ export default class MainPath extends RenderPass {
     this.bullets = this.bullets.allUpdate((e) => {
       e.update(time);
       if (e.pos.x > 50) {
-        this.scene.remove(e.mesh);
+        this.scene.remove(e.model);
         return false;
       } else {
         return true;
@@ -67,7 +66,7 @@ export default class MainPath extends RenderPass {
     this.bullets.cellUpdate(this.enemy, (e) => {
       const distance = new Vector3().copy(e.pos).sub(this.enemy.pos).length();
       if (distance < contactDistance) {
-        this.scene.remove(e.mesh);
+        this.scene.remove(e.model);
         return false;
       } else {
         return true;
@@ -85,7 +84,7 @@ export default class MainPath extends RenderPass {
       if (time - this.player.lastFiredTime > config.bullet.rate) {
         const bullet = new Bullet(this.player.pos);
         this.bullets.add(bullet);
-        this.scene.add(bullet.mesh);
+        this.scene.add(bullet.model);
         this.player.lastFiredTime = time;
       }
     }
@@ -102,10 +101,10 @@ export default class MainPath extends RenderPass {
   private async setObjects() {
     this.bullets = new QTree(this.areaDownnerLeft, this.areaSize);
     this.player = await Player.init();
-    this.player.mesh.position.set(0, 0, 0);
+    this.player.model.position.set(0, 0, 0);
 
     this.enemy = new Enemy();
 
-    this.scene.add(this.player.mesh, this.enemy.mesh);
+    this.scene.add(this.player.model, this.enemy.model);
   }
 }

@@ -1,9 +1,18 @@
-import { BoxGeometry, Group, Mesh, Vector2 } from "three";
+import {
+  GLSL3,
+  Group,
+  Mesh,
+  MeshBasicMaterial,
+  RawShaderMaterial,
+  Uniform,
+  Vector2,
+} from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { Key } from "../Key";
 import config from "../config";
 import GameObject from "./GameObject";
-import createStanderdMaterial from "../materials/StanderdMaterial";
+import vs from "../../glsl/standerd.vert";
+import fs from "../../glsl/gltf.frag";
 import playerModel from "../../assets/models/player.glb";
 export default class Player extends GameObject {
   radius: number;
@@ -24,8 +33,11 @@ export default class Player extends GameObject {
           (gltf) => {
             resolve(gltf.scene);
           },
+          (xhr) => {
+            console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+          },
           (err) => {
-            console.error(err);
+            console.error("Player gltf Model loading Error:", err);
           }
         );
       });
@@ -70,7 +82,13 @@ export default class Player extends GameObject {
   private set(model: Group) {
     model.traverse((object) => {
       if ((object as Mesh).isMesh) {
-        (object as Mesh).material = createStanderdMaterial(0xffffff);
+        const tex = ((object as Mesh).material as MeshBasicMaterial).map;
+        (object as Mesh).material = new RawShaderMaterial({
+          uniforms: { tex: new Uniform(tex) },
+          vertexShader: vs,
+          fragmentShader: fs,
+          glslVersion: GLSL3,
+        });
       }
     });
     this.model = model;

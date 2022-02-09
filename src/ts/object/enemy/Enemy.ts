@@ -1,7 +1,7 @@
 import { GLSL3, RawShaderMaterial, SphereGeometry, WebGLRenderer } from "three";
 import config from "../../config";
 import standerdVs from "../../../glsl/standerd.vert";
-import texFs from "../../../glsl/tex.frag";
+import texFs from "../../../glsl/enemy/enemy.frag";
 
 import createStanderdMaterial from "../../materials/StanderdMaterial";
 import { BossTexture } from "../../renderPass/bossTexture/BossTexture";
