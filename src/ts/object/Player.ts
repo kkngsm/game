@@ -15,20 +15,21 @@ import vs from "../../glsl/standerd.vert";
 import fs from "../../glsl/gltf.frag";
 import playerModel from "../../assets/models/player.glb";
 import { Hp } from "./hp";
+import { GameInfos } from "../../types/type";
 export default class Player extends GameObject {
   hp: Hp;
   radius: number;
   lastFiredTime: number;
   speed: Vector2;
-  constructor() {
-    super();
+  constructor(infos: GameInfos) {
+    super(infos);
     this.hp = new Hp(10);
     this.radius = config.player.radius;
     this.speed = new Vector2(0, 0);
     this.lastFiredTime = -10;
   }
-  public static async init(): Promise<Player> {
-    const player = new Player();
+  public static async init(infos: GameInfos): Promise<Player> {
+    const player = new Player(infos);
     await player.set();
     return player;
   }
@@ -61,8 +62,14 @@ export default class Player extends GameObject {
   }
   update() {
     /*移動*/
-    this.model.position.x += this.speed.x;
-    this.model.position.y += this.speed.y;
+    const x = this.model.position.x + this.speed.x;
+    if (this.infos.areaDownnerLeft.x < x && x < this.infos.areaSize.x / 2) {
+      this.model.position.setX(x);
+    }
+    const y = this.model.position.y + this.speed.y;
+    if (this.infos.areaDownnerLeft.y < y && y < this.infos.areaSize.y / 2) {
+      this.model.position.setY(y);
+    }
     this.speed.multiplyScalar(0.9);
   }
   private async set() {

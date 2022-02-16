@@ -9,17 +9,17 @@ import {
 } from "three";
 import { Key } from "../Key";
 import config from "../config";
-import Enemy from "../object/Enemy/Enemy";
+import Enemy from "../object/enemy/Enemy";
 import RenderPass from "./RenderPass";
 import { QTree } from "../QTree/QTree";
 import { WebGLDefferdRenderTargets } from "../WebGLDefferdRenderTargets";
+import { GameInfos } from "../../types/type";
 /**
  * メインの処理のクラス
  * 遅延なのでalbedo, normalを出力
  */
 export default class MainPath extends RenderPass {
-  private areaSize: Vector2;
-  private areaDownnerLeft: Vector2;
+  private infos: GameInfos;
 
   private player: Player;
   private bullets: QTree<Bullet>;
@@ -36,8 +36,12 @@ export default class MainPath extends RenderPass {
     this.camera.lookAt(new Vector3(0, 0, 0));
 
     const areaHeight = Math.tan((fov / 180) * 0.5 * Math.PI) * cameraZ * 2;
-    this.areaSize = new Vector2(areaHeight * aspect, areaHeight);
-    this.areaDownnerLeft = this.areaSize.clone().multiplyScalar(-0.5);
+    const areaSize = new Vector2(areaHeight * aspect, areaHeight);
+    this.infos = {
+      areaSize,
+      areaDownnerLeft: areaSize.clone().multiplyScalar(-0.5),
+      windowSize,
+    };
   }
   public static async init(windowSize: Vector2): Promise<MainPath> {
     const main = new MainPath(windowSize);
@@ -85,7 +89,7 @@ export default class MainPath extends RenderPass {
     this.player.operation(key);
     if (key.space) {
       if (time - this.player.lastFiredTime > config.bullet.rate) {
-        const bullet = new Bullet(this.player.pos);
+        const bullet = new Bullet(this.infos, this.player.pos);
         this.bullets.add(bullet);
         this.scene.add(bullet.model);
         this.player.lastFiredTime = time;
@@ -105,11 +109,11 @@ export default class MainPath extends RenderPass {
     return this.enemy.hp.hp / this.enemy.hp.maxHp;
   }
   private async setObjects() {
-    this.bullets = new QTree(this.areaDownnerLeft, this.areaSize);
-    this.player = await Player.init();
+    this.bullets = new QTree(this.infos.areaDownnerLeft, this.infos.areaSize);
+    this.player = await Player.init(this.infos);
     this.player.model.position.set(0, 0, 0);
 
-    this.enemy = await Enemy.init();
+    this.enemy = await Enemy.init(this.infos);
 
     this.scene.add(this.player.model, this.enemy.model);
   }

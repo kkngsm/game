@@ -8,21 +8,22 @@ import fs from "../../../glsl/gltf.frag";
 import bossModel from "../../../assets/models/boss.glb";
 import createStanderdMaterial from "../../materials/StanderdMaterial";
 import { Hp } from "../hp";
+import { GameInfos } from "../../../types/type";
 
 export default class Enemy extends GameObject {
   hp: Hp;
   radius: number;
   texture: BossTexture;
   uniforms: any;
-  constructor() {
-    super();
+  constructor(infos: GameInfos) {
+    super(infos);
     this.hp = new Hp(20);
     this.texture = new BossTexture();
     this.uniforms = { tex: { type: "t", value: undefined } };
     this.radius = config.enemy.radius;
   }
-  public static async init() {
-    const enemy = new Enemy();
+  public static async init(infos: GameInfos) {
+    const enemy = new Enemy(infos);
     await enemy.set();
     return enemy;
   }
