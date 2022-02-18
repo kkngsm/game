@@ -40,7 +40,7 @@ const config: Config = {
     radius: 2,
   },
   enemy: {
-    radius: 20,
+    radius: 15,
     particleNumSqrt: 512,
     hp: 10,
   },

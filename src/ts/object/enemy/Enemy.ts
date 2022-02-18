@@ -88,7 +88,7 @@ export default class Enemy extends GameObject {
     }
     this.model = model;
     this.model.position.set(20, 0, 0);
-    this.model.scale.set(3, 3, 3);
+    this.model.scale.set(this.radius, this.radius, this.radius);
     this.model.rotateY(-0.9);
   }
 }
