@@ -21,6 +21,9 @@ import { GameProps, MainInfos, RenderProps } from "../../types/type";
  */
 export class MainPass extends RenderPass {
   readonly rawRender: WebGLDefferdRenderTargets;
+  // HUDのための情報取得関数
+  private infos: MainInfos;
+
   private player: Player;
   private bullets: QTree<Bullet>;
   private enemy: Enemy;
@@ -53,6 +56,7 @@ export class MainPass extends RenderPass {
       ]
     );
   }
+
   /**
    * 初期化関数
    * @param gps ゲーム関連の定数
@@ -75,6 +79,7 @@ export class MainPass extends RenderPass {
    * @returns  次フレームも計算するか(true)、しないか(false)
    */
   update(time: number, prevTime: number): boolean {
+    this.infos.time = time;
     const elapsedTime = time - prevTime;
     this.bullets = this.bullets.allUpdate((e) => {
       if (e.update(elapsedTime)) {
@@ -135,7 +140,7 @@ export class MainPass extends RenderPass {
    * @returns MainInfos
    */
   getInfos(): MainInfos {
-    return { enemy: { hp: this.enemy.hp } };
+    return this.infos;
   }
   /**
    * 初期設定をする。init関数で呼び出される。
@@ -158,5 +163,6 @@ export class MainPass extends RenderPass {
     this.enemy = await Enemy.init(this.halfPlayAreaSize);
 
     this.scene.add(this.player.model, this.enemy.model);
+    this.infos = { enemyHP: this.enemy.hp, playerHP: this.player.hp, time: 0 };
   }
 }

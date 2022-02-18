@@ -2,6 +2,7 @@ type PlayerSetting = {
   acceleration: number;
   maxSpeed: number;
   radius: number;
+  hp: number;
 };
 
 type WeponsSetting = {
@@ -34,6 +35,7 @@ const config: Config = {
     acceleration: 0.1,
     maxSpeed: 0.5,
     radius: 5,
+    hp: 10,
   },
   bullet: {
     rate: 100,

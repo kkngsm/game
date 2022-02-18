@@ -16,9 +16,15 @@ export class Hud {
 
     ctx2D.fillStyle = "red";
     ctx2D.fillRect(
+      50 + windowSize.x * 0.5,
+      50,
+      (windowSize.x * 0.5 - 100) * (this.infos.enemyHP.hp / config.enemy.hp),
+      40
+    );
+    ctx2D.fillRect(
       50,
       50,
-      (windowSize.x - 100) * (this.infos.enemy.hp.hp / config.enemy.hp),
+      (windowSize.x * 0.5 - 100) * (this.infos.playerHP.hp / config.player.hp),
       40
     );
   }

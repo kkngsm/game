@@ -12,5 +12,7 @@ export type RenderProps = {
 };
 
 export type MainInfos = {
-  enemy: { hp: Hp };
+  enemyHP: Hp;
+  playerHP: Hp;
+  time: number;
 };

@@ -92,7 +92,7 @@ export default class Player extends GameObject {
    * 初期設定をする。init関数で呼び出される。
    */
   private async set() {
-    this.hp = new Hp(10);
+    this.hp = new Hp(config.player.hp);
     this.radius = config.player.radius;
     this.speed = new Vector2(0, 0);
     this.lastFiredTime = -10;
