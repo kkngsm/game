@@ -1,4 +1,12 @@
-import { GLSL3, Group, Mesh, RawShaderMaterial, WebGLRenderer } from "three";
+import {
+  GLSL3,
+  Group,
+  Mesh,
+  RawShaderMaterial,
+  Texture,
+  Vector2,
+  WebGLRenderer,
+} from "three";
 import config from "../../config";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { BossTexture } from "../../renderPass/bossTexture/BossTexture";
@@ -8,31 +16,47 @@ import fs from "../../../glsl/gltf.frag";
 import bossModel from "../../../assets/models/boss.glb";
 import createStanderdMaterial from "../../materials/StanderdMaterial";
 import { Hp } from "../hp";
-import { GameInfos } from "../../../types/type";
 
 export default class Enemy extends GameObject {
   hp: Hp;
   radius: number;
   texture: BossTexture;
-  uniforms: any;
-  constructor(infos: GameInfos) {
-    super(infos);
-    this.hp = new Hp(20);
+  uniforms: { tex: { type: "t"; value: undefined | Texture } };
+  constructor(halfPlayArea: Vector2) {
+    super(halfPlayArea);
+    this.hp = new Hp(config.enemy.hp);
     this.texture = new BossTexture();
     this.uniforms = { tex: { type: "t", value: undefined } };
     this.radius = config.enemy.radius;
   }
-  public static async init(infos: GameInfos) {
-    const enemy = new Enemy(infos);
+  /**
+   * (注)MainPassインスタンス生成にはMainPass.init()を用いる
+   * @param halfPlayArea プレイエリアの大きさの半分
+   * @returns Promise<Player>
+   */
+  public static async init(halfPlayArea: Vector2) {
+    const enemy = new Enemy(halfPlayArea);
     await enemy.set();
     return enemy;
   }
-  update(time: number) {
-    this.model.position.set(20, Math.sin(time * 0.001) * 10, 0);
+  /**
+   * 更新処理
+   * @param elapsedTime 前フレームからの経過時間
+   * @returns Enemyが生きているか、否か
+   */
+  update(elapsedTime: number): boolean {
+    return true;
   }
+  /**
+   * テクスチャの描画
+   * @param renderer WebGLRenderer
+   */
   render(renderer: WebGLRenderer) {
     this.uniforms.tex.value = this.texture.render(renderer);
   }
+  /**
+   * 初期設定をする。init関数で呼び出される。
+   */
   private async set() {
     const loader = new GLTFLoader();
     const model = await (() => {

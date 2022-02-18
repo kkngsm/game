@@ -1,26 +1,29 @@
-import { LinearFilter, RGBAFormat, UnsignedByteType } from "three";
-import MainPass from "../renderPass/MainPass";
-import { WebGLDefferdRenderTargets } from "../WebGLDefferdRenderTargets";
-import { Scene, SceneProps, State } from "./Scene";
+import { Scene, State } from "./Scene";
 import { PostPass } from "../renderPass/PostPass";
+import { Hud } from "./HUD/Hud";
+import { GameProps, RenderProps } from "../../types/type";
+import { MainPass } from "../renderPass/MainPass";
 export default class Battle extends Scene {
   private main: MainPass;
   private post: PostPass;
-  private rawRender: WebGLDefferdRenderTargets;
-  constructor(prop: SceneProps) {
-    super(prop);
+  private hud: Hud;
+  constructor(gps: GameProps, rps: RenderProps) {
+    super(gps, rps);
   }
-  public static async init(props: SceneProps) {
-    const battle = new Battle(props);
+  public static async init(gps: GameProps, rps: RenderProps) {
+    const battle = new Battle(gps, rps);
     await battle.set();
     return battle;
   }
   async run(): Promise<State> {
+    let prevTime = 0;
     return new Promise<void>((resolve) => {
       const loop = (time: number) => {
         this.operation(time);
-        const next = this.update(time);
+        const next = this.update(time, prevTime);
         this.draw();
+
+        prevTime = time;
         if (next) {
           requestAnimationFrame(loop);
         } else {
@@ -33,52 +36,24 @@ export default class Battle extends Scene {
     });
   }
 
-  private update(time: number): boolean {
-    return this.main.update(time);
+  private update(time: number, prevTime: number): boolean {
+    return this.main.update(time, prevTime);
   }
   private draw(): void {
-    this.main.render(this.renderer, this.rawRender);
-    this.post.render(this.renderer, null);
-    this.ctx2D.drawImage(
-      this.renderer.domElement,
-      0,
-      0,
-      this.windowSize.x,
-      this.windowSize.y
-    );
-    this.ctx2D.fillStyle = "red";
-    this.ctx2D.fillRect(
-      50,
-      50,
-      (this.windowSize.x - 100) * this.main.getEnemyHp(),
-      40
-    );
+    const { renderer, ctx2D } = this.rps;
+    const { windowSize } = this.gps;
+    ctx2D.clearRect(0, 0, windowSize.x, windowSize.y);
+    this.main.render();
+    this.post.render();
+    ctx2D.drawImage(renderer.domElement, 0, 0, windowSize.x, windowSize.y);
+    this.hud.draw();
   }
   private operation(time: number) {
-    this.main.operation(time, this.key);
+    this.main.operation(time);
   }
   private async set() {
-    this.main = await MainPass.init(this.windowSize);
-    this.rawRender = new WebGLDefferdRenderTargets(
-      this.windowSize.width,
-      this.windowSize.height,
-      [
-        {
-          name: "albedo",
-          minFilter: LinearFilter,
-          magFilter: LinearFilter,
-          type: UnsignedByteType,
-          format: RGBAFormat,
-        },
-        {
-          name: "normal",
-          minFilter: LinearFilter,
-          magFilter: LinearFilter,
-          type: UnsignedByteType,
-          format: RGBAFormat,
-        },
-      ]
-    );
-    this.post = new PostPass(this.windowSize, this.rawRender);
+    this.main = await MainPass.init(this.gps, this.rps);
+    this.hud = new Hud(this.gps, this.rps, this.main.getInfos());
+    this.post = new PostPass(this.gps, this.rps, this.main.rawRender);
   }
 }

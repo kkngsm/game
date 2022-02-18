@@ -7,11 +7,8 @@ import {
   PlaneGeometry,
   RawShaderMaterial,
   RGBAFormat,
-  Texture,
+  Uniform,
   UnsignedByteType,
-  Vector2,
-  Vector3,
-  WebGLRenderer,
   WebGLRenderTarget,
 } from "three";
 import RenderPass from "./RenderPass";
@@ -23,6 +20,7 @@ import {
   renderInfo,
   WebGLDefferdRenderTargets,
 } from "../WebGLDefferdRenderTargets";
+import { GameProps, RenderProps } from "../../types/type";
 
 /**
  * ポストエフェクトクラス
@@ -30,11 +28,7 @@ import {
  */
 export class PostPass extends RenderPass {
   private uniforms: {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    [uniform in "cameraPos" | "resolution" | renderInfo]: {
-      type: string;
-      value: Texture | Vector2 | Vector3;
-    };
+    [uniform in "cameraPos" | "resolution" | renderInfo]: Uniform;
   };
   private tempRenderTarget: WebGLRenderTarget[];
   private materials: Material[];
@@ -44,12 +38,15 @@ export class PostPass extends RenderPass {
    * @param prevRenderTargets 前処理でのレンダリング結果
    */
   constructor(
-    windowSize: Vector2,
+    gps: GameProps,
+    rps: RenderProps,
     private prevRenderTargets: WebGLDefferdRenderTargets
   ) {
-    super(new OrthographicCamera(-0.5, 0.5, 0.5, -0.5, -10000, 10000));
+    super(rps);
+    this.camera = new OrthographicCamera(-0.5, 0.5, 0.5, -0.5, -10000, 10000);
     this.camera.position.z = 100;
-    const wrt = new WebGLRenderTarget(windowSize.x, windowSize.y, {
+
+    const wrt = new WebGLRenderTarget(gps.windowSize.x, gps.windowSize.y, {
       minFilter: LinearFilter,
       magFilter: LinearFilter,
       format: RGBAFormat,
@@ -58,13 +55,10 @@ export class PostPass extends RenderPass {
     this.tempRenderTarget = [wrt, wrt.clone()];
 
     this.uniforms = {
-      cameraPos: { type: "v3", value: this.camera.position },
-      resolution: {
-        type: "v2",
-        value: new Vector2(windowSize.x, windowSize.y),
-      },
-      albedo: { type: "t", value: prevRenderTargets.texture[0] },
-      normal: { type: "t", value: prevRenderTargets.texture[1] },
+      cameraPos: new Uniform(this.camera.position),
+      resolution: new Uniform(gps.windowSize),
+      albedo: new Uniform(prevRenderTargets.texture[0]),
+      normal: new Uniform(prevRenderTargets.texture[1]),
     };
 
     this.materials = [
@@ -98,10 +92,8 @@ export class PostPass extends RenderPass {
    * レンダリングをする。
    * @param renderer WebGLRenderer
    */
-  render(
-    renderer: WebGLRenderer,
-    renderTarget: WebGLRenderTarget | WebGLDefferdRenderTargets | null
-  ): void {
+  render(): void {
+    const { renderer } = this.rps;
     this.uniforms.albedo.value = this.prevRenderTargets.texture[0];
     const maxIndex = this.materials.length - 1;
     for (let i = 0; i < maxIndex; i++) {
@@ -113,7 +105,7 @@ export class PostPass extends RenderPass {
     }
 
     this.mesh.material = this.materials[maxIndex];
-    renderer.setRenderTarget(renderTarget);
+    renderer.setRenderTarget(null);
     renderer.render(this.scene, this.camera);
   }
 }

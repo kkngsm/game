@@ -16,6 +16,7 @@ type QTreeSetting = {
 type EnemySetting = {
   radius: number;
   particleNumSqrt: number;
+  hp: number;
 };
 
 type Config = {
@@ -41,6 +42,7 @@ const config: Config = {
   enemy: {
     radius: 20,
     particleNumSqrt: 512,
+    hp: 10,
   },
 } as const;
 export default config;

@@ -18,3 +18,22 @@ https://kkngsm.github.io/game/
 - [ ] 敵モブの追加
 - [ ] 敵アニメーションの追加
 - [ ] ステージの追加
+
+## クラス図
+
+```mermaid
+sequenceDiagram
+  Title: 全体の遷移図
+  participant T as Title
+  participant B as Battle
+  participant R as Result
+  participant E as End
+
+  T->>B: 
+  loop
+    B->>B: Play Game
+  end
+  B->>R: 
+  R->>B: Retry
+  R->>E: End
+```

@@ -15,25 +15,35 @@ import vs from "../../glsl/standerd.vert";
 import fs from "../../glsl/gltf.frag";
 import playerModel from "../../assets/models/player.glb";
 import { Hp } from "./hp";
-import { GameInfos } from "../../types/type";
+
 export default class Player extends GameObject {
   hp: Hp;
   radius: number;
   lastFiredTime: number;
   speed: Vector2;
-  constructor(infos: GameInfos) {
-    super(infos);
-    this.hp = new Hp(10);
-    this.radius = config.player.radius;
-    this.speed = new Vector2(0, 0);
-    this.lastFiredTime = -10;
+  /**
+   * (注)Playerインスタンス生成にはPlayer.init()を用いる
+   * @param halfPlayArea プレイエリアの大きさの半分
+   */
+  constructor(halfPlayArea: Vector2) {
+    super(halfPlayArea);
   }
-  public static async init(infos: GameInfos): Promise<Player> {
-    const player = new Player(infos);
+
+  /**
+   * 初期化関数
+   * @param halfPlayArea プレイエリアの大きさの半分
+   * @returns Promise<Player>
+   */
+  public static async init(halfPlayArea: Vector2): Promise<Player> {
+    const player = new Player(halfPlayArea);
     await player.set();
     return player;
   }
-  operation(key: Key) {
+  /**
+   * 操作による更新を行う
+   * @param key 入力
+   */
+  operation(key: Key): void {
     /*加速*/
     if (key.w) {
       this.speed.y += config.player.acceleration;
@@ -60,19 +70,32 @@ export default class Player extends GameObject {
       this.speed.y = -config.player.maxSpeed;
     }
   }
-  update() {
+  /**
+   * 更新処理
+   * @param elapsedTime 前フレームからの経過時間
+   * @returns Playerが生きているか、否か
+   */
+  update(elapsedTime: number): boolean {
     /*移動*/
     const x = this.model.position.x + this.speed.x;
-    if (this.infos.areaDownnerLeft.x < x && x < this.infos.areaSize.x / 2) {
+    if (-this.halfPlayArea.x < x && x < this.halfPlayArea.x / 2) {
       this.model.position.setX(x);
     }
     const y = this.model.position.y + this.speed.y;
-    if (this.infos.areaDownnerLeft.y < y && y < this.infos.areaSize.y / 2) {
+    if (-this.halfPlayArea.y < y && y < this.halfPlayArea.y * 0.75) {
       this.model.position.setY(y);
     }
     this.speed.multiplyScalar(0.9);
+    return true;
   }
+  /**
+   * 初期設定をする。init関数で呼び出される。
+   */
   private async set() {
+    this.hp = new Hp(10);
+    this.radius = config.player.radius;
+    this.speed = new Vector2(0, 0);
+    this.lastFiredTime = -10;
     const loader = new GLTFLoader();
     const model = await (() => {
       return new Promise<Group>((resolve) => {

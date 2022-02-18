@@ -1,20 +1,10 @@
-import {
-  Scene as TScene,
-  Camera,
-  WebGLRenderer,
-  WebGLRenderTarget,
-} from "three";
-import { WebGLDefferdRenderTargets } from "../WebGLDefferdRenderTargets";
+import { Camera, Scene as TScene } from "three";
+import { RenderProps } from "../../types/type";
 
 export default abstract class RenderPass {
+  protected camera: Camera;
   readonly scene: TScene;
-  readonly camera: Camera;
-  constructor(camera: Camera) {
+  constructor(protected rps: RenderProps) {
     this.scene = new TScene();
-    this.camera = camera;
   }
-  abstract render(
-    renderer: WebGLRenderer,
-    renderTarget: WebGLRenderTarget | WebGLDefferdRenderTargets | null
-  ): void;
 }

@@ -1,61 +1,83 @@
 import Bullet from "../object/bullet/Bullet";
 import Player from "../object/Player";
 import {
+  LinearFilter,
   PerspectiveCamera,
+  RGBAFormat,
+  UnsignedByteType,
   Vector2,
   Vector3,
-  WebGLRenderer,
-  WebGLRenderTarget,
 } from "three";
-import { Key } from "../Key";
 import config from "../config";
 import Enemy from "../object/enemy/Enemy";
 import RenderPass from "./RenderPass";
 import { QTree } from "../QTree/QTree";
 import { WebGLDefferdRenderTargets } from "../WebGLDefferdRenderTargets";
-import { GameInfos } from "../../types/type";
+import { GameProps, MainInfos, RenderProps } from "../../types/type";
+
 /**
  * メインの処理のクラス
- * 遅延なのでalbedo, normalを出力
+ * 遅延レンダリングのためのalbedo, normalを出力
  */
-export default class MainPath extends RenderPass {
-  private infos: GameInfos;
-
+export class MainPass extends RenderPass {
+  readonly rawRender: WebGLDefferdRenderTargets;
   private player: Player;
   private bullets: QTree<Bullet>;
   private enemy: Enemy;
+  private halfPlayAreaSize: Vector2;
   /**
-   * @param windowSize 画面サイズ
+   * (注)MainPassインスタンス生成にはMainPass.init()を用いる
+   * @param gps ゲーム関連の定数
+   * @param rps レンダリング関連の定数
    */
-  constructor(windowSize: Vector2) {
-    const fov = 45;
-    const cameraZ = 100;
-    const aspect = windowSize.x / windowSize.y;
-    super(new PerspectiveCamera(fov, aspect, 1, 10000));
-    this.camera.position.z = cameraZ;
-    this.camera.lookAt(new Vector3(0, 0, 0));
-
-    const areaHeight = Math.tan((fov / 180) * 0.5 * Math.PI) * cameraZ * 2;
-    const areaSize = new Vector2(areaHeight * aspect, areaHeight);
-    this.infos = {
-      areaSize,
-      areaDownnerLeft: areaSize.clone().multiplyScalar(-0.5),
-      windowSize,
-    };
+  constructor(private gps: GameProps, rps: RenderProps) {
+    super(rps);
+    this.rawRender = new WebGLDefferdRenderTargets(
+      gps.windowSize.x,
+      gps.windowSize.y,
+      [
+        {
+          name: "albedo",
+          minFilter: LinearFilter,
+          magFilter: LinearFilter,
+          type: UnsignedByteType,
+          format: RGBAFormat,
+        },
+        {
+          name: "normal",
+          minFilter: LinearFilter,
+          magFilter: LinearFilter,
+          type: UnsignedByteType,
+          format: RGBAFormat,
+        },
+      ]
+    );
   }
-  public static async init(windowSize: Vector2): Promise<MainPath> {
-    const main = new MainPath(windowSize);
-    await main.setObjects();
+  /**
+   * 初期化関数
+   * @param gps ゲーム関連の定数
+   * @param rps レンダリング関連の定数
+   * @returns MainPassインスタンス
+   */
+  public static async init(
+    gps: GameProps,
+    rps: RenderProps
+  ): Promise<MainPass> {
+    const main = new MainPass(gps, rps);
+    await main.set();
     return main;
   }
+
   /**
-   * 更新処理をする
-   * 接触、ダメージなど
+   * 更新処理
+   * @param  time 経過時間
+   * @param  prevTime 前フレームの時間
+   * @returns  次フレームも計算するか(true)、しないか(false)
    */
-  update(time: number) {
+  update(time: number, prevTime: number): boolean {
+    const elapsedTime = time - prevTime;
     this.bullets = this.bullets.allUpdate((e) => {
-      e.update(time);
-      if (e.pos.x > 50) {
+      if (e.update(elapsedTime)) {
         this.scene.remove(e.model);
         return false;
       } else {
@@ -63,8 +85,8 @@ export default class MainPath extends RenderPass {
       }
     });
 
-    this.player.update();
-    this.enemy.update(time);
+    this.player.update(elapsedTime);
+    this.enemy.update(elapsedTime);
 
     // enemyとの当たり判定
     const contactDistance = config.bullet.radius + config.enemy.radius;
@@ -78,42 +100,62 @@ export default class MainPath extends RenderPass {
         return true;
       }
     });
-    return !this.enemy.hp.isDead();
+    return this.enemy.hp.isAlive();
   }
   /**
    * 操作による更新を行う
    * @param time レンダリング開始からの時間
    * @param key キー入力クラス
    */
-  operation(time: number, key: Key) {
+  operation(time: number) {
+    const { key } = this.gps;
     this.player.operation(key);
     if (key.space) {
       if (time - this.player.lastFiredTime > config.bullet.rate) {
-        const bullet = new Bullet(this.infos, this.player.pos);
+        const bullet = new Bullet(this.halfPlayAreaSize, this.player.pos);
         this.bullets.add(bullet);
         this.scene.add(bullet.model);
         this.player.lastFiredTime = time;
       }
     }
   }
-  render(
-    renderer: WebGLRenderer,
-    renderTarget: WebGLRenderTarget | WebGLDefferdRenderTargets | null
-  ): void {
+  /**
+   * レンダリング
+   */
+  render(): void {
+    const { renderer } = this.rps;
     this.enemy.render(renderer);
-    renderer.setRenderTarget(renderTarget);
+    renderer.setRenderTarget(this.rawRender);
     renderer.clear();
     renderer.render(this.scene, this.camera);
   }
-  getEnemyHp(): number {
-    return this.enemy.hp.hp / this.enemy.hp.maxHp;
+
+  /**
+   * HUDのための情報取得関数
+   * @returns MainInfos
+   */
+  getInfos(): MainInfos {
+    return { enemy: { hp: this.enemy.hp } };
   }
-  private async setObjects() {
-    this.bullets = new QTree(this.infos.areaDownnerLeft, this.infos.areaSize);
-    this.player = await Player.init(this.infos);
+  /**
+   * 初期設定をする。init関数で呼び出される。
+   */
+  private async set(): Promise<void> {
+    const fov = 45;
+    const cameraZ = 100;
+    const aspect = this.gps.windowSize.x / this.gps.windowSize.y;
+    this.camera = new PerspectiveCamera(fov, aspect, 1, 10000);
+    this.camera.position.z = cameraZ;
+    this.camera.lookAt(new Vector3(0, 0, 0));
+
+    const areaHeight = Math.tan((fov / 180) * 0.5 * Math.PI) * cameraZ * 2;
+    const areaSize = new Vector2(areaHeight * aspect, areaHeight);
+    this.halfPlayAreaSize = areaSize.clone().multiplyScalar(0.5);
+    this.bullets = new QTree<Bullet>(this.halfPlayAreaSize, areaSize);
+    this.player = await Player.init(this.halfPlayAreaSize);
     this.player.model.position.set(0, 0, 0);
 
-    this.enemy = await Enemy.init(this.infos);
+    this.enemy = await Enemy.init(this.halfPlayAreaSize);
 
     this.scene.add(this.player.model, this.enemy.model);
   }

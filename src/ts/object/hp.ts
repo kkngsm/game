@@ -8,7 +8,7 @@ export class Hp {
   damage(d: number) {
     this.hp -= d;
   }
-  isDead(): boolean {
-    return this.hp <= 0;
+  isAlive(): boolean {
+    return this.hp > 0;
   }
 }
