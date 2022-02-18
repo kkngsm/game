@@ -39,7 +39,7 @@ export class Drawer {
       wrapT: RepeatWrapping,
       format: RGBAFormat,
     });
-
+    this.result.texture.generateMipmaps = true;
     // パーティクルの設定
     const particlesPos = new Float32Array(particleNum * 3);
     const particlesIndices = new Float32Array(particleNum).map((_, i) => i);
